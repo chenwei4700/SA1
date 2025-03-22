@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 app = Flask(__name__)
 
 # Google Sheets API 設定
-SERVICE_ACCOUNT_FILE = "venv/static/api.json"  # 你的 JSON 金鑰
+SERVICE_ACCOUNT_FILE = "api.json"  # 你的 JSON 金鑰
 SPREADSHEET_ID = "1C_qYknxD84tMd3yAFMmYepNHa2raJJXEbp8ZL01HeMc"  # 你的試算表 ID
 
 # 設定 Google Sheets API 權限
