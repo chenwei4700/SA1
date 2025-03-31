@@ -60,5 +60,11 @@ def ask():
 
     return jsonify({"response": f"問題：{question}\n回答：{final_answer}"})
 
+@app.route('/clear_history', methods=['POST'])
+def clear_history():
+    # 這裡你可以選擇清除聊天紀錄的方式
+    # 比如：不做後端處理，單純清除畫面
+    return jsonify({"message": "對話紀錄已清除"}), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
