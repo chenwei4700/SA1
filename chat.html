@@ -1,80 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <title>聊天介面</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聊天室</title>
-    <script>
-        async function sendMessage() {
-            const question = document.getElementById("question").value;
-            const responseDiv = document.getElementById("response");
-
-            if (!question) {
-                responseDiv.innerText = "請輸入問題！";
-                return;
-            }
-
-            const response = await fetch("/ask", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ question })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                responseDiv.innerText = data.response;
-            } else {
-                responseDiv.innerText = data.response || "發生錯誤，請稍後再試。";
-            }
-        }
-
-        // 添加清除對話歷史的函數
-        function clearHistory() {
-            // 清除對話歷史和工作表2
-            fetch('/clear_history', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // 清空對話顯示區域
-                document.getElementById('response').innerHTML = '';
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
-
     <style>
-        .clear-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+        .bot-message {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        #question {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
             padding: 10px 20px;
-            background-color: #ff4444;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-
+        button:hover {
+            background-color: #45a049;
+        }
+        .clear-btn {
+            background-color: #f44336;
+        }
         .clear-btn:hover {
-            background-color: #cc0000;
+            background-color: #da190b;
         }
     </style>
 </head>
 <body>
-    <h1>聊天室</h1>
-    <div>
-        <input type="text" id="question" placeholder="請輸入您的問題">
-        <button onclick="sendMessage()">送出</button>
-        <button id="clearBtn" class="clear-btn" onclick="clearHistory()">清除對話</button>
+    <div class="chat-container">
+        <div id="chat-messages"></div>
+        <div class="input-container">
+            <input type="text" id="question" placeholder="請輸入您的問題...">
+            <button onclick="sendQuestion()">發送</button>
+            <button class="clear-btn" onclick="clearChat()">清除對話</button>
+        </div>
     </div>
-    <div id="response" style="margin-top: 20px; font-weight: bold;"></div>
+
+    <script>
+        function addMessage(text, isUser) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function sendQuestion() {
+            const questionInput = document.getElementById('question');
+            const question = questionInput.value.trim();
+            
+            if (!question) return;
+            
+            addMessage(question, true);
+            questionInput.value = '';
+            
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    addMessage('錯誤：' + data.error, false);
+                } else {
+                    addMessage(data.response, false);
+                }
+            })
+            .catch(error => {
+                addMessage('發生錯誤：' + error, false);
+            });
+        }
+
+        function clearChat() {
+            document.getElementById('chat-messages').innerHTML = '';
+        }
+
+        // 按 Enter 發送訊息
+        document.getElementById('question').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendQuestion();
+            }
+        });
+    </script>
 </body>
 </html>
