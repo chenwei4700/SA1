@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室</title>
+    <script>
+        async function sendMessage() {
+            const question = document.getElementById("question").value;
+            const responseDiv = document.getElementById("response");
+
+            if (!question) {
+                responseDiv.innerText = "請輸入問題！";
+                return;
+            }
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ question })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                responseDiv.innerText = data.response;
+            } else {
+                responseDiv.innerText = data.response || "發生錯誤，請稍後再試。";
+            }
+        }
+
+        // 添加清除對話歷史的函數
+        function clearHistory() {
+            // 清除對話歷史和工作表2
+            fetch('/clear_history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                // 清空對話顯示區域
+                document.getElementById('response').innerHTML = '';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <input type="text" id="question" placeholder="請輸入問題">
+        <button onclick="sendMessage()">發送</button>
+        <button onclick="clearHistory()">清除歷史</button>
+    </div>
+    <div id="response"></div>
+</body>
+</html>
