@@ -1,0 +1,251 @@
+/* 全域設定 */
+/* 整體畫面滿版佈局 */
+html, body {
+  height: 100%;
+  margin: 0;
+  /* background-color: #f7f8f9; */
+  background-color: rgb(253, 250, 243);
+  font-family: sans-serif;
+}
+
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 導覽列 */
+.nav-bar {
+  /* position: fixed;
+  top: 0;
+  left: 0;
+  right: 0; */
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ✅ 陰影 */
+}
+
+.nav-link {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  gap: 30px;
+  width: 60px;
+  height: 20px;
+}
+
+.nav-link a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding:15px; /* 左右 padding */
+  font-weight: bold;
+}
+
+.nav-link a:hover {
+  background-color: rgb(255, 166, 0);
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  color: white;
+}
+
+.nav-bar span{
+  font-size: 27px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+h1 {
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* 聊天框區域 */
+.chat-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px;
+  gap: 10px;
+  width: 80%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* 對話訊息泡泡 */
+.message {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-line;
+}
+
+.user {
+  align-self: flex-end;
+  background-color: rgb(250, 195, 94);
+  color: #000;
+  border-top-right-radius: 0;
+}
+
+.bot {
+  align-self: flex-start;
+  background-color: #f1f1f1;
+  color: #000;
+  border-top-left-radius: 0;
+}
+
+/* 輸入區 */
+#input-area {
+  display: flex;
+  padding: 12px 20px;
+  gap: 10px;
+  border-top: 1px solid #ccc;
+  /* background-color: #f4f4f4; */
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+}
+
+#question {
+  width: 30vw;
+  height: 40px;
+  font-size: 16px;
+  padding: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+}
+
+/* 按鈕樣式 */
+.sent {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 70px;
+}
+
+.clear-btn {
+  padding: 8px 12px;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sent:hover {
+  background-color: #0056b3;
+}
+
+.clear-btn:hover {
+  background-color: #cc0000;
+}
+
+#animated-title {
+  display: block;
+  text-align: center;
+  margin: 80px auto 0; /* 上方留空距離 */
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: .15em solid black;
+  font-family: monospace;
+  font-size: 2em;
+  animation: typing 5s steps(24, end) 0s 3, blink-caret .75s step-end infinite;
+}
+
+/* 打字動畫 */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 18ch } /* 根據文字長度調整 */
+}
+
+/* 光標動畫 */
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: black }
+}
+
+#menu-toggle{
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -270px; /* 完全隱藏 */
+  width: 220px;
+  height: 100vh;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  transition: left 0.3s ease;
+  opacity: 0.7;
+}
+
+.menu-divider {
+  border: none;
+  height: 1px;
+  background-color: white;     /* 顏色依背景調整 */
+  opacity: 0.4;                 /* 稍微透明更柔和 */
+  margin: 4px 0 ;           /* 上下間距 */
+}
+
+
+#sidebar.active {
+  left: 0;
+}
+
+/* 關閉按鈕 */
+#close-sidebar {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* 側邊欄連結 */
+#sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+/*新增*/
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
