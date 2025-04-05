@@ -12,38 +12,54 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
     />
-    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCQvRUMCVLV0tQ-FTN0ozYD46foS6NsF8Ow&s">
+    <link
+      rel="icon"
+      href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCQvRUMCVLV0tQ-FTN0ozYD46foS6NsF8Ow&s"
+    />
     <script>
       async function sendMessage() {
         const question = document.getElementById("question").value;
         const responseDiv = document.getElementById("response");
+        const loading = document.getElementById("loading");
 
         if (!question) {
           responseDiv.innerHTML += `<div class="message bot">請輸入問題！</div>`;
           return;
         }
 
+        // 顯示使用者輸入、清空欄位、顯示 loading
         responseDiv.innerHTML += `<div class="message user">${question}</div>`;
         document.getElementById("question").value = "";
+        loading.style.display = "block";
 
-        const response = await fetch("/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ question }),
-        });
+        try {
+          const response = await fetch("/ask", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question }),
+          });
 
-        const data = await response.json();
-        if (response.ok) {
-          responseDiv.innerHTML += `<div class="message bot">${data.response}</div>`;
-        } else {
-          responseDiv.innerHTML += `<div class="message bot">發生錯誤，請稍後再試。</div>`;
+          const data = await response.json();
+
+          // 處理回應前先隱藏 loading
+          loading.style.display = "none";
+
+          if (response.ok) {
+            // 去除回答中的 ** 符號
+            const cleanText = data.response.replace(/\*\*/g, "");
+            responseDiv.innerHTML += `<div class="message bot">${cleanText}</div>`;
+          } else {
+            responseDiv.innerHTML += `<div class="message bot">發生錯誤，請稍後再試。</div>`;
+          }
+
+          responseDiv.scrollTop = responseDiv.scrollHeight;
+        } catch (err) {
+          loading.style.display = "none";
+          responseDiv.innerHTML += `<div class="message bot">連線錯誤，請稍後再試。</div>`;
         }
-
-        responseDiv.scrollTop = responseDiv.scrollHeight;
       }
-
       function clearHistory() {
         fetch("/clear_history", {
           method: "POST",
@@ -69,7 +85,7 @@
         <div id="sidebar">
           <button id="close-sidebar"><i class="bi bi-x-lg"></i></button>
           <h2>選單</h2>
-          <hr class="menu-divider">
+          <hr class="menu-divider" />
           <a href="#"><i class="fa-solid fa-house"></i> 首頁</a>
           <a href="#"><i class="fa-solid fa-right-to-bracket"></i> 登入</a>
           <a href="#"><i class="fa-solid fa-right-from-bracket"></i> 登出</a>
@@ -171,7 +187,9 @@
       <h1 id="animated-title">開始查詢第一個問題！</h1>
 
       <div id="response" class="chat-box"></div>
-
+      <!--新增-->
+      <div id="loading" class="loading-spinner" style="display: none"></div>
+      <!--新增-->
       <div id="input-area">
         <input type="text" id="question" placeholder="請輸入您的問題" />
         <button onclick="sendMessage()" class="sent">
