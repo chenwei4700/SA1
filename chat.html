@@ -1,80 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聊天室</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>課業問題查詢</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='chat.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link
+      rel="icon"
+      href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCQvRUMCVLV0tQ-FTN0ozYD46foS6NsF8Ow&s"
+    />
     <script>
-        async function sendMessage() {
-            const question = document.getElementById("question").value;
-            const responseDiv = document.getElementById("response");
+      async function sendMessage() {
+        const question = document.getElementById("question").value;
+        const responseDiv = document.getElementById("response");
+        const loading = document.getElementById("loading");
 
-            if (!question) {
-                responseDiv.innerText = "請輸入問題！";
-                return;
-            }
-
-            const response = await fetch("/ask", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ question })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                responseDiv.innerText = data.response;
-            } else {
-                responseDiv.innerText = data.response || "發生錯誤，請稍後再試。";
-            }
+        if (!question) {
+          responseDiv.innerHTML += `<div class="message bot">請輸入問題！</div>`;
+          return;
         }
 
-        // 添加清除對話歷史的函數
-        function clearHistory() {
-            // 清除對話歷史和工作表2
-            fetch('/clear_history', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // 清空對話顯示區域
-                document.getElementById('response').innerHTML = '';
-            })
-            .catch(error => console.error('Error:', error));
+        // 顯示使用者輸入、清空欄位、顯示 loading
+        responseDiv.innerHTML += `<div class="message user">${question}</div>`;
+        document.getElementById("question").value = "";
+        loading.style.display = "block";
+
+        try {
+          const response = await fetch("/ask", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question }),
+          });
+
+          const data = await response.json();
+
+          // 處理回應前先隱藏 loading
+          loading.style.display = "none";
+
+          if (response.ok) {
+            // 去除回答中的 ** 符號
+            const cleanText = data.response.replace(/\*\*/g, "");
+            responseDiv.innerHTML += `<div class="message bot">${cleanText}</div>`;
+          } else {
+            responseDiv.innerHTML += `<div class="message bot">發生錯誤，請稍後再試。</div>`;
+          }
+
+          responseDiv.scrollTop = responseDiv.scrollHeight;
+        } catch (err) {
+          loading.style.display = "none";
+          responseDiv.innerHTML += `<div class="message bot">連線錯誤，請稍後再試。</div>`;
         }
+      }
+      function clearHistory() {
+        fetch("/clear_history", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message);
+            document.getElementById("response").innerHTML = "";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
     </script>
+  </head>
+  <body>
+    <div class="chat-wrapper">
+      <nav class="nav-bar">
+        <button id="menu-toggle">
+          <i class="bi bi-border-width"></i>
+        </button>
+        <div id="sidebar">
+          <button id="close-sidebar"><i class="bi bi-x-lg"></i></button>
+          <h2>選單</h2>
+          <hr class="menu-divider" />
+          <a href="#"><i class="fa-solid fa-house"></i> 首頁</a>
+          <a href="#"><i class="fa-solid fa-right-to-bracket"></i> 登入</a>
+          <a href="#"><i class="fa-solid fa-right-from-bracket"></i> 登出</a>
+        </div>
+        <a href="/">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 200 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <!-- 學士帽頂部（平面板），採用複雜曲線模擬透視與彎曲效果 -->
+            <path
+              d="M40 60 L160 60 L140 100 C130 110, 110 110, 100 100 C90 90, 70 90, 60 100 Z"
+              stroke="#1e3a5f"
+              stroke-width="2"
+              fill="none"
+            />
+            <!-- 板面內部放射狀細節 -->
+            <line
+              x1="40"
+              y1="60"
+              x2="100"
+              y2="80"
+              stroke="#1e3a5f"
+              stroke-width="1"
+            />
+            <line
+              x1="160"
+              y1="60"
+              x2="100"
+              y2="80"
+              stroke="#1e3a5f"
+              stroke-width="1"
+            />
+            <line
+              x1="140"
+              y1="100"
+              x2="100"
+              y2="80"
+              stroke="#1e3a5f"
+              stroke-width="1"
+            />
+            <line
+              x1="60"
+              y1="100"
+              x2="100"
+              y2="80"
+              stroke="#1e3a5f"
+              stroke-width="1"
+            />
 
-    <style>
-        .clear-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+            <!-- Tassel（流蘇）連接點 -->
+            <circle cx="100" cy="80" r="3" fill="#1e3a5f" />
+            <!-- 流蘇本體，多段曲線增加細節感 -->
+            <path
+              d="M100 80 C105 90, 110 105, 102 115 C95 125, 90 140, 100 155"
+              stroke="#1e3a5f"
+              stroke-width="2"
+              fill="none"
+            />
+            <!-- 流蘇結 -->
+            <circle cx="100" cy="80" r="4" fill="#1e3a5f" />
 
-        .clear-btn:hover {
-            background-color: #cc0000;
-        }
-    </style>
-</head>
-<body>
-    <h1>聊天室</h1>
-    <div>
-        <input type="text" id="question" placeholder="請輸入您的問題">
-        <button onclick="sendMessage()">送出</button>
-        <button id="clearBtn" class="clear-btn" onclick="clearHistory()">清除對話</button>
+            <!-- 帽緣（頭帶）的後側弧線 -->
+            <path
+              d="M60 100 C65 115, 135 115, 140 100"
+              stroke="#1e3a5f"
+              stroke-width="2"
+              fill="none"
+            />
+
+            <!-- 額外細節：上緣的虛線曲線，模擬邊緣紋理 -->
+            <path
+              d="M40 60 Q100 50, 160 60"
+              stroke="#1e3a5f"
+              stroke-width="1"
+              fill="none"
+              stroke-dasharray="4 2"
+            />
+            <!-- 板面下緣的虛線細節 -->
+            <path
+              d="M60 100 Q100 110, 140 100"
+              stroke="#1e3a5f"
+              stroke-width="1"
+              fill="none"
+              stroke-dasharray="4 2"
+            />
+          </svg>
+        </a>
+        <span>輔大資管系</span>
+        <div class="nav-link">
+          <i class="bi bi-house-door"></i><a href="#">首頁</a>
+          <i class="bi bi-box-arrow-in-right"></i><a href="#">登入</a>
+          <i class="bi bi-box-arrow-right"></i><a href="#">登出</a>
+        </div>
+      </nav>
+      <h1 id="animated-title">開始查詢第一個問題！</h1>
+
+      <div id="response" class="chat-box"></div>
+      <!--新增-->
+      <div id="loading" class="loading-spinner" style="display: none"></div>
+      <!--新增-->
+      <div id="input-area">
+        <input type="text" id="question" placeholder="請輸入您的問題" />
+        <button onclick="sendMessage()" class="sent">
+          <i class="bi bi-send"></i> 送出
+        </button>
+        <button onclick="clearHistory()" class="clear-btn">
+          <i class="bi bi-x-square"></i> 清除對話
+        </button>
+      </div>
     </div>
-    <div id="response" style="margin-top: 20px; font-weight: bold;"></div>
-</body>
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("menu-toggle");
+      const closeBtn = document.getElementById("close-sidebar");
+
+      toggleBtn.addEventListener("click", () => {
+        sidebar.classList.add("active");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+      });
+      setTimeout(() => {
+        const title = document.getElementById("animated-title");
+        title.remove(); // 或用 title.style.display = "none";
+      }, 15000);
+    </script>
+  </body>
 </html>

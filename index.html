@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}首頁{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">課業交流貼文</h1>
+
+{% for post in posts %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="card-title">{{ post.title }}</h2>
+        <p class="card-text">{{ post.content }}</p>
+        <p class="text-muted">發布時間：{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <div class="btn-group">
+            <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-primary">編輯</a>
+            <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('確定要刪除這篇貼文嗎？')">刪除</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    目前還沒有任何貼文。
+</div>
+{% endfor %}
+{% endblock %} 
