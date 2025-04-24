@@ -113,7 +113,7 @@ def register():
             conn.close()
             return "帳號已存在，請使用其他帳號"
 
-        cur.execute("INSERT INTO Users (account, password, user_name, role) VALUES (%s, %s, %s, 'm')", (account, password, name))
+        cur.execute("INSERT INTO Users (account, password, user_name, role) VALUES (%s, %s, %s, 'U')", (account, password, name))
         conn.commit()
         cur.close()
         conn.close()
