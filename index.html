@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">部落格文章</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <a href="/post/post/new" class="btn btn-primary mb-3">新增文章</a>
+
+    {% for post in posts %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text">{{ post.content }}</p>
+            <p class="card-text"><small class="text-muted">發布時間：{{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></p>
+            <div class="btn-group">
+                <a href="/post/post/{{ post.id }}/edit" class="btn btn-sm btn-outline-primary">編輯</a>
+                {% if session.get('role') == 'R' %}  //只有管理者才看的到
+                <form action="/post/post/{{ post.id }}/delete" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('確定要刪除這篇文章嗎？')">刪除</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 
