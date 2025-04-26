@@ -1,0 +1,94 @@
+/* 整體背景與字型 */
+body {
+    background-color: rgb(253, 250, 243);
+    font-family: sans-serif;
+  }
+  
+  /* 主標題 */
+  h1.mb-4 {
+    text-align: center;
+    font-size: 28px;
+    margin-top: 75px;
+    color: #1e3a5f;
+    font-weight: bold;
+  }
+  
+  /* 卡片樣式 */
+  .card {
+    background-color: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 卡片內部文字 */
+  .card-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .card-text {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .text-muted {
+    font-size: 14px;
+    color: #888;
+  }
+  
+  /* 按鈕群組 */
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  /* 編輯按鈕 */
+  .btn-primary {
+    background-color: #007bffb5;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  /* 刪除按鈕 */
+  .btn-danger {
+    background-color: #f44336b5;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c62828;
+  }
+  
+  /* 無貼文時的提示訊息 */
+  .alert-info {
+    width: 80%;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #e9f5ff;
+    color: #007bff;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+  }
