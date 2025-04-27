@@ -1,0 +1,187 @@
+/* =========================
+   按鈕樣式統一
+========================= */
+.sent, .btn-edit, .btn-delete {
+    display: inline-block;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none
+  }
+  
+  .sent {
+    background-color: #1e3a5f;
+    color: white;
+  }
+  
+  .sent:hover {
+    background-color: #163250;
+  }
+  
+  .btn-edit {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .btn-edit:hover {
+    background-color: #0056b3;
+  }
+  
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-delete:hover {
+    background-color: #a71d2a;
+  }
+  
+  /* =========================
+     卡片區塊置中 + 樣式
+  ========================= */
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 20px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 600px; /* 貼文最大寬度 */
+  }
+  
+  /* =========================
+     內部文字
+  ========================= */
+  .page-title {
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    font-weight: 800;
+  }
+  
+  .card-title {
+    margin-bottom: 10px;
+    font-size: 2.8rem;
+    font-weight: 700;
+  }
+  
+  .card-text {
+    margin-bottom: 10px;
+    font-size: 1.3rem
+  }
+  
+  .card-time {
+    font-size: 0.9rem;
+    color: gray;
+    margin-bottom: 1rem;
+  }
+  
+  .card-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .inline-form {
+    display: inline;
+  }
+  
+  .no-posts {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2rem;
+    color: #777;
+  }
+  
+  /* =========================
+     新增貼文按鈕外框
+  ========================= */
+  .button-wrapper {
+    text-align: right;
+    margin: 20px auto;
+    max-width: 600px;
+  }
+
+  /* =========================
+   新增貼文表單樣式
+========================= */
+.post-form-container {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 80px auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-submit, .btn-cancel {
+  display: inline-block;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+
+.btn-submit:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+  

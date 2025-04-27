@@ -1,0 +1,143 @@
+"""
+若要改用 MySQL 資料庫，需要進行以下修改：
+
+1. 安裝必要套件：
+   pip install mysql-connector-python
+
+2. 資料庫連接設定：
+   import mysql.connector
+   db = mysql.connector.connect(
+       host="localhost",
+       user="your_username",
+       password="your_password",
+       database="your_database"
+   )
+   cursor = db.cursor(dictionary=True)
+
+3. 需要創建的資料表結構：
+   CREATE TABLE faq (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       question TEXT,
+       answer TEXT
+   );
+
+   CREATE TABLE cached_content (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       timestamp DATETIME,
+       url TEXT,
+       content TEXT
+   );
+"""
+
+// ... existing imports ...
+
+"""
+# MySQL 版本的資料庫初始化代碼：
+db = mysql.connector.connect(
+    host="localhost",
+    user="your_username",
+    password="your_password",
+    database="your_database"
+)
+cursor = db.cursor(dictionary=True)
+"""
+
+def fetch_and_save_webpage_content(url):
+    """
+    MySQL 版本：
+    try:
+        content = fetch_webpage_content(url)
+        if content:
+            sql = "INSERT INTO cached_content (timestamp, url, content) VALUES (%s, %s, %s)"
+            values = (datetime.now(), url, content)
+            cursor.execute(sql, values)
+            db.commit()
+            return content
+    except Exception as e:
+        print(f"儲存網頁內容時發生錯誤: {str(e)}")
+        db.rollback()
+    return None
+    """
+    // ... existing code ...
+
+def search_cached_content(question):
+    """
+    MySQL 版本：
+    try:
+        sql = "SELECT content FROM cached_content WHERE content LIKE %s"
+        cursor.execute(sql, (f"%{question}%",))
+        results = cursor.fetchall()
+        
+        relevant_contents = []
+        for row in results:
+            relevant_contents.append(f"相關網頁內容：\n{row['content']}")
+        
+        return "\n\n".join(relevant_contents) if relevant_contents else None
+    except Exception as e:
+        print(f"查詢快取內容時發生錯誤: {str(e)}")
+        return None
+    """
+    // ... existing code ...
+
+def clear_cached_content():
+    """
+    MySQL 版本：
+    try:
+        sql = "TRUNCATE TABLE cached_content"
+        cursor.execute(sql)
+        db.commit()
+        print("已清除暫存的網頁內容")
+    except Exception as e:
+        print(f"清除快取內容時發生錯誤: {str(e)}")
+        db.rollback()
+    """
+    // ... existing code ...
+
+def collect_similar_answers(question):
+    """
+    MySQL 版本：
+    # 先查詢暫存內容
+    cached_content = search_cached_content(question)
+    if cached_content:
+        return cached_content
+    
+    # 從 FAQ 表中查詢
+    try:
+        sql = "SELECT question, answer FROM faq WHERE LOWER(question) LIKE LOWER(%s)"
+        cursor.execute(sql, (f"%{question}%",))
+        results = cursor.fetchall()
+        
+        collected_responses = []
+        for row in results:
+            answer = row['answer']
+            words = answer.split()
+            webpage_contents = []
+            
+            for word in words:
+                if is_url(word):
+                    content = fetch_and_save_webpage_content(word)
+                    if content:
+                        webpage_contents.append(f"網頁內容：\n{content}")
+            
+            full_response = f"問題：{row['question']}\n回答：{answer}"
+            if webpage_contents:
+                full_response += "\n\n" + "\n\n".join(webpage_contents)
+            
+            collected_responses.append(full_response)
+        
+        return "\n\n---\n\n".join(collected_responses) if collected_responses else "抱歉，我找不到相關的答案。"
+    except Exception as e:
+        print(f"查詢FAQ時發生錯誤: {str(e)}")
+        return "抱歉，查詢時發生錯誤。"
+    """
+    // ... existing code ...
+
+"""
+# 程式結束時記得關閉資料庫連接：
+if __name__ == '__main__':
+    try:
+        app.run(debug=True)
+    finally:
+        cursor.close()
+        db.close()
+"""

@@ -1,0 +1,56 @@
+/* =========================
+   修改個人資料表單樣式
+========================= */
+body {
+    margin-top: 150px
+}
+
+.profile-form-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 2rem;
+  }
+  
+  .profile-form-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .profile-form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-form-container input[type="text"],
+  .profile-form-container input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .profile-form-container button[type="submit"] {
+    width: 100%;
+    background-color: #1e3a5f;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .profile-form-container button[type="submit"]:hover {
+    background-color: #163250;
+  }
+  

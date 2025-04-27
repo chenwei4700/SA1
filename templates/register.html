@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>登入頁面</title>
+  </head>
+  <body>
+    <h2>請註冊</h2>
+    <div>
+      <form action="/register" method="POST">
+        <div>
+            <label>Email（學號@fju.edu.tw）:</label><br>
+            <input type="text" name="account" pattern="\d{9}@fju\.edu\.tw" required><br>
+        </div>
+        <div>
+            <label>密碼：</label><br>
+            <input type="password" name="password" minlength="6" maxlength="20" required><br>
+        </div>
+        <div>
+            <label>使用者姓名：</label><br>
+            <input type="text" name="name" required><br>
+        </div>
+        <input type="submit" value="註冊" />
+    </form>
+    
+    </div>
+  </body>
+</html>
