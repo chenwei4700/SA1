@@ -1,22 +1,28 @@
 from flask import Flask, render_template, request, redirect, session, flash
 import mysql.connector
 import os
+import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from post import post_bp, db   # 引入 post.py 的功能
+from post import post_bp, db
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# 設定 SQLite 資料庫
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'  # 使用 posts.db 作為資料庫
+# ✅ SQLite 設定給交流區用
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
 
-# 註冊交流區 blueprint
+# ✅ 初始化資料庫
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+
+# ✅ 註冊交流區 blueprint
 app.register_blueprint(post_bp, url_prefix='/post')
 
-# 設定 MySQL 資料庫
+# ✅ MySQL 資料庫連線
+
 def get_db_connection():
     return mysql.connector.connect(
         user='root',
@@ -25,7 +31,7 @@ def get_db_connection():
         unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
     )
 
-# 設定檔案上傳路徑
+# ✅ 上傳檔案設定
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'heic'}
@@ -33,10 +39,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'heic'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# ✅ 首頁（登入頁）
 @app.route('/')
 def home():
     return render_template('login.html')
 
+# ✅ 登入功能
 @app.route('/login', methods=['POST'])
 def do_login():
     account = request.form['account']
@@ -44,54 +52,71 @@ def do_login():
 
     conn = get_db_connection()
     cur = conn.cursor()
+
     cur.execute("SELECT * FROM Users WHERE account = %s AND password = %s", (account, password))
     user = cur.fetchone()
-    cur.close()
-    conn.close()
 
     if user:
         session['user'] = account
         session['name'] = user[3]
-        return redirect('/dashboard')
-    else:
-        return "登入失敗，請檢查帳號密碼"
+        session['role'] = user[4]
 
-@app.route('/dashboard')
-def dashboard():
-    if 'user' in session:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(""" 
-            SELECT u.user_name, i.file_path
-            FROM Users u
-            LEFT JOIN images i ON u.account = i.user
-            WHERE u.account = %s
-            ORDER BY i.uploadtime DESC
+        # 查詢頭像
+        cur.execute("""
+            SELECT file_path
+            FROM images
+            WHERE user = %s
+            ORDER BY uploadtime DESC
             LIMIT 1
-        """, (session['user'],))
-        user = cur.fetchone()
+        """, (account,))
+        img = cur.fetchone()
+
+        if img and img[0]:
+            session['avatar'] = img[0]
+        else:
+            session['avatar'] = 'images/avatar.png'
+
         cur.close()
         conn.close()
 
-        avatar = user[1] if user[1] else 'images/avatar.png'
-        return render_template('main.html', name=user[0], avatar=avatar)
+        return redirect('/dashboard')
+
+    else:
+        cur.close()
+        conn.close()
+        return "登入失敗，請檢查帳號密碼"
+
+# ✅ 登出
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+# ✅ 主頁（dashboard）
+@app.route('/dashboard')
+def dashboard():
+    if 'user' in session:
+        return render_template('main.html', name=session['name'], avatar=session['avatar'])
     else:
         return redirect('/')
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
-@app.route("/register", methods=['GET', 'POST'])
+# ✅ 註冊新帳號
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         account = request.form['account']
         password = request.form['password']
         name = request.form['name']
 
+        if not re.match(r'^\d{9}@fju\.edu\.tw$', account):
+            return "帳號必須是9位數字+@fju.edu.tw的格式"
+        # ✅ 檢查密碼長度
+        if len(password) < 6 or len(password) > 20:
+            return "密碼長度必須在6到20字之間"
+        
         conn = get_db_connection()
         cur = conn.cursor()
+
         cur.execute("SELECT * FROM Users WHERE account = %s", (account,))
         existing_user = cur.fetchone()
 
@@ -106,64 +131,50 @@ def register():
         conn.close()
 
         return redirect('/')
-    else:
-        return render_template("register.html")
 
-@app.route('/upload_avatar', methods=['POST'])
-def upload_avatar():
-    if 'photo' not in request.files:
-        return '沒有選擇檔案'
+    return render_template('register.html')
 
-    file = request.files['photo']
-    if file.filename == '':
-        return '沒有選擇檔案'
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filename = session['user'] + '_' + filename
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO images (file_name, file_path, uploadtime, user) VALUES (%s, %s, NOW(), %s)", 
-                    (filename, filepath, session['user']))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return redirect('/dashboard')
-    else:
-        return '檔案格式不支援'
-
-@app.route('/profile')
-def profile():
-    if 'user' in session:
-        return render_template('profile.html')
-    else:
-        return redirect('/')
-
-@app.route('/update_name', methods=['POST'])
-def update_name():
+# ✅ 修改名字＋上傳頭像（合併版）
+@app.route('/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    avatar = session.get('avatar', 'images/avatar.png')
+    name = session.get('name', '未登入')
     if 'user' not in session:
         return redirect('/')
 
-    new_name = request.form['name']
+    if request.method == 'POST':
+        new_name = request.form['name']
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE Users SET user_name = %s WHERE account = %s", (new_name, session['user']))
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-    session['name'] = new_name
-    return redirect('/dashboard')
+        # 更新名字
+        cur.execute("UPDATE Users SET user_name = %s WHERE account = %s", (new_name, session['user']))
+        conn.commit()
+        session['name'] = new_name
 
-@app.route("/information")
-def information():
-    if 'user' in session:
-        return render_template("information.html")
+        # 更新頭像（如果有選）
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filename = session['user'] + '_' + filename
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+
+                cur.execute("INSERT INTO images (file_name, file_path, uploadtime, user) VALUES (%s, %s, NOW(), %s)",
+                            (filename, filepath, session['user']))
+                conn.commit()
+                session['avatar'] = filepath
+
+        cur.close()
+        conn.close()
+
+        flash('個人資料更新成功！')
+        return redirect('/dashboard')
+
+    return render_template('combine.html', avatar=avatar, name=name)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

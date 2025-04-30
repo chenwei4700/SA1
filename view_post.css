@@ -1,0 +1,268 @@
+/* 按讚按鈕樣式 */
+.btn-like {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-like:hover {
+    transform: scale(1.1);
+}
+
+.btn-like i {
+    margin-right: 5px;
+}
+
+/* 留言區樣式 */
+.comment-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.comment-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+}
+
+.comment-title i {
+    margin-right: 8px;
+    color: #007bff;
+}
+
+.comment-form {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.comment-input {
+    width: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.comment-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+.comment-submit {
+    border-radius: 8px;
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.comment-submit:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.comments {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.comment-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.comment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-right: 30px; /* 為刪除按鈕留出空間 */
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+}
+
+.comment-author i {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 0.9em;
+}
+
+.comment-time {
+    font-size: 0.8em;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.comment-content {
+    color: #495057;
+    line-height: 1.6;
+    padding: 10px 0;
+    font-size: 0.95em;
+    word-break: break-word;
+}
+
+.comment-delete {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+.comment-delete button {
+    background: none;
+    border: none;
+    color: #dc3545;
+    padding: 5px;
+    font-size: 1em;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-delete button:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.comment-delete button i {
+    font-size: 1.1em;
+}
+
+/* 自定義滾動條 */
+.comments::-webkit-scrollbar {
+    width: 6px;
+}
+
+.comments::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.comments::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.comments::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 卡片樣式 */
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: none;
+    background: #ffffff;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* 卡片標題 */
+.card-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 1.8em;
+}
+
+/* 卡片內容 */
+.card-text {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 1.05em;
+}
+
+/* 卡片時間 */
+.card-time {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.card-time i {
+    margin-right: 8px;
+    color: #6c757d;
+}
+
+/* 輸入組樣式 */
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group .form-control {
+    flex: 1;
+    border-radius: 8px;
+}
+
+/* 警告訊息 */
+.alert {
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 12px 20px;
+}
+
+.alert-info {
+    background-color: #e3f2fd;
+    border-color: #8cecf3;
+    color: #3d44d1;
+}
+
+/* 容器樣式 */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 15px;
+} 

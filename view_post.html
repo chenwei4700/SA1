@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view_post.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ post.title }}</h1>
+            <p class="card-text">{{ post.content }}</p>
+            <p class="card-time">
+                <i class="far fa-clock"></i> 發佈時間: {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+
+            <!-- 按讚按鈕 -->
+            <form action="{{ url_for('post.like_post', post_id=post.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn-like">
+                    <i class="fas fa-heart"></i> {{ post.likes|length }}
+                </button>
+            </form>
+
+            <!-- 留言區 -->
+            <div class="comment-section mt-4">
+                <h3 class="comment-title">
+                    <i class="far fa-comments"></i> 留言 ({{ post.comments|length }})
+                </h3>
+                
+                <!-- 留言表單 -->
+                {% if session.get('user') %}
+                <form action="{{ url_for('post.add_comment', post_id=post.id) }}" method="POST" class="comment-form mb-3">
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control comment-input" placeholder="輸入留言..." required>
+                        <button type="submit" class="btn btn-primary comment-submit">
+                            <i class="fas fa-paper-plane"></i> 留言
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+                
+                <!-- 顯示留言 -->
+                <div class="comments">
+                    {% for comment in post.comments|sort(attribute='created_at', reverse=true) %}
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <span class="comment-author">
+                                <i class="far fa-user"></i> {{ comment.author_account }}
+                            </span>
+                            <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </div>
+                        <div class="comment-content">
+                            {{ comment.content }}
+                        </div>
+                        {% if session.get('role') == 'M' or comment.author_account == session.get('user') %}
+                        <div class="comment-delete">
+                            <form action="{{ url_for('post.delete_comment', post_id=post.id, comment_id=comment.id) }}" method="POST">
+                                <input type="hidden" name="next" value="view_post">
+                                <button type="submit" onclick="return confirm('確定要刪除此留言嗎？')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

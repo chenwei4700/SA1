@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block title %}所有貼文{% endblock %}
+
+{% block content %}
+<h1 class="page-title">所有貼文</h1>
+
+<!-- 新增貼文按鈕 -->
+<div class="button-wrapper">
+    <a href="{{ url_for('post.new_post') }}" class="sent">新增貼文</a>
+</div>
+
+{% for post in posts %}
+    <div class="card" id="post-{{ post.id }}">
+        <div class="card-body">
+            <div class="post-content">
+                <h2 class="card-title">{{ post.title }}</h2>
+                <p class="card-text">{{ post.content }}</p>
+                <p class="card-time">
+                    <i class="far fa-clock"></i> 發佈時間: {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                </p>
+            </div>
+
+            <!-- 按讚按鈕 -->
+            <form action="{{ url_for('post.like_post', post_id=post.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn-like">
+                    <i class="fas fa-heart"></i> {{ post.likes|length }}
+                </button>
+            </form>
+
+            <!-- 留言區 -->
+            <div class="comment-section mt-4">
+                <div class="comment-header">
+                    <h6 class="comment-title">
+                        <i class="far fa-comments"></i> 留言 ({{ post.comments|length }})
+                    </h6>
+                    <button class="btn btn-sm btn-toggle-comments" onclick="toggleComments(this)">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <div class="comment-content" style="display: none;">
+                    {% if session.get('user') %}
+                    <form action="{{ url_for('post.add_comment', post_id=post.id) }}" method="POST" class="comment-form mb-3">
+                        <div class="input-group">
+                            <input type="hidden" name="next" value="interact">
+                            <input type="text" name="content" class="form-control comment-input" placeholder="輸入留言..." required>
+                            <button type="submit" class="btn btn-primary comment-submit">
+                                <i class="fas fa-paper-plane"></i> 留言
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                    
+                    <!-- 顯示留言 -->
+                    <div class="comments">
+                        {% for comment in post.comments|sort(attribute='created_at', reverse=true) %}
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <span class="comment-author">
+                                    <i class="far fa-user"></i> {{ comment.author_account }}
+                                </span>
+                                <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                            {% if session.get('role') == 'M' or comment.author_account == session.get('user') %}
+                            <div class="comment-delete">
+                                <form action="{{ url_for('post.delete_comment', post_id=post.id, comment_id=comment.id) }}" method="POST">
+                                    <input type="hidden" name="next" value="interact">
+                                    <button type="submit" class="btn-delete-comment" onclick="return confirm('確定要刪除此留言嗎？')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {% if session.get('role') == 'M' %}
+            <!-- 只有管理員看到的刪除按鈕 -->
+            <div class="card-buttons">
+                <form action="{{ url_for('post.delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="next" value="interact">
+                    <button type="submit" class="btn-delete" onclick="return confirm('確定要刪除這篇文章嗎？')">刪除</button>
+                </form>        
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <p class="no-posts">目前尚無貼文。</p>
+{% endfor %}
+
+<style>
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.post-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.btn-like {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-like:hover {
+    transform: scale(1.1);
+}
+
+.btn-like i {
+    margin-right: 5px;
+}
+
+/* 留言區樣式 */
+.comment-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.comment-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.comment-title i {
+    margin-right: 8px;
+    color: #007bff;
+}
+
+.btn-toggle-comments {
+    background: none;
+    border: none;
+    color: #6c757d;
+    padding: 5px 10px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-toggle-comments:hover {
+    color: #007bff;
+}
+
+.btn-toggle-comments.active i {
+    transform: rotate(180deg);
+}
+
+.comment-form {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.comment-input {
+    width: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.comment-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+.comment-submit {
+    border-radius: 8px;
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.comment-submit:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.comments {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.comment-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.comment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.comment-card .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-right: 30px;
+}
+
+.comment-card .comment-author {
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+}
+
+.comment-card .comment-author i {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 0.9em;
+}
+
+.comment-card .comment-time {
+    font-size: 0.8em;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.comment-card .comment-content {
+    color: #495057;
+    line-height: 1.6;
+    padding: 10px 0;
+    font-size: 0.95em;
+    word-break: break-word;
+    display: block;
+}
+
+.comment-delete {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+.comment-delete button {
+    background: none;
+    border: none;
+    color: #dc3545;
+    padding: 5px;
+    font-size: 1em;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-delete button:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.comment-delete button i {
+    font-size: 1.1em;
+}
+
+/* 自定義滾動條 */
+.comments::-webkit-scrollbar {
+    width: 6px;
+}
+
+.comments::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.comments::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.comments::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 卡片按鈕 */
+.card-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.btn-delete-comment {
+    background: none;
+    border: none;
+    color: #dc3545;
+    padding: 5px;
+    font-size: 1em;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-comment:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.btn-delete-comment i {
+    font-size: 1.1em;
+}
+</style>
+
+<script>
+function toggleComments(button) {
+    const commentContent = button.closest('.comment-section').querySelector('.comment-content');
+    const isHidden = commentContent.style.display === 'none';
+    
+    commentContent.style.display = isHidden ? 'block' : 'none';
+    button.querySelector('i').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+// 頁面載入時處理
+document.addEventListener('DOMContentLoaded', function() {
+    // 如果有錨點，展開對應貼文的留言區
+    if (window.location.hash) {
+        const postId = window.location.hash.substring(1);
+        const targetPost = document.getElementById(postId);
+        if (targetPost) {
+            const commentSection = targetPost.querySelector('.comment-section');
+            const commentContent = commentSection.querySelector('.comment-content');
+            const toggleButton = commentSection.querySelector('.btn-toggle-comments');
+            
+            if (commentContent && toggleButton) {
+                commentContent.style.display = 'block';
+                toggleButton.querySelector('i').style.transform = 'rotate(180deg)';
+                
+                // 平滑滾動到目標位置
+                setTimeout(() => {
+                    targetPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
