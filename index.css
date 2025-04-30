@@ -1,4 +1,18 @@
-/* 按讚按鈕樣式 */
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.post-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
 .btn-like {
     background: none;
     border: none;
@@ -7,6 +21,8 @@
     cursor: pointer;
     padding: 5px 10px;
     transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-like:hover {
@@ -27,20 +43,42 @@
     border: 1px solid #e9ecef;
 }
 
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
 .comment-title {
     color: #2c3e50;
     font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e9ecef;
     font-size: 1.2em;
     display: flex;
     align-items: center;
+    margin: 0;
 }
 
 .comment-title i {
     margin-right: 8px;
     color: #007bff;
+}
+
+.btn-toggle-comments {
+    background: none;
+    border: none;
+    color: #6c757d;
+    padding: 5px 10px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-toggle-comments:hover {
+    color: #007bff;
+}
+
+.btn-toggle-comments.active i {
+    transform: rotate(180deg);
 }
 
 .comment-form {
@@ -49,6 +87,7 @@
 }
 
 .comment-input {
+    width: 100%;
     border: 1px solid #e9ecef;
     border-radius: 8px;
     padding: 12px 15px;
@@ -67,6 +106,7 @@
     border-radius: 8px;
     padding: 12px 20px;
     background-color: #007bff;
+    color: white;
     border: none;
     transition: all 0.3s ease;
     font-weight: 500;
@@ -80,7 +120,7 @@
 }
 
 .comments {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
     padding-right: 10px;
 }
@@ -101,27 +141,28 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.comment-header {
+.comment-card .comment-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    padding-right: 30px;
 }
 
-.comment-author {
+.comment-card .comment-author {
     font-weight: 600;
     color: #2c3e50;
     display: flex;
     align-items: center;
 }
 
-.comment-author i {
+.comment-card .comment-author i {
     margin-right: 8px;
     color: #007bff;
     font-size: 0.9em;
 }
 
-.comment-time {
+.comment-card .comment-time {
     font-size: 0.8em;
     color: #6c757d;
     background: #f8f9fa;
@@ -129,17 +170,20 @@
     border-radius: 4px;
 }
 
-.comment-content {
+.comment-card .comment-content {
     color: #495057;
     line-height: 1.6;
     padding: 10px 0;
     font-size: 0.95em;
+    word-break: break-word;
+    display: block;
 }
 
 .comment-delete {
     position: absolute;
     top: 15px;
     right: 15px;
+    z-index: 10;
 }
 
 .comment-delete button {
@@ -147,15 +191,23 @@
     border: none;
     color: #dc3545;
     padding: 5px;
-    font-size: 0.9em;
+    font-size: 1em;
     opacity: 0.7;
     transition: all 0.3s ease;
     border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .comment-delete button:hover {
     opacity: 1;
     background: rgba(220, 53, 69, 0.1);
+}
+
+.comment-delete button i {
+    font-size: 1.1em;
 }
 
 /* 自定義滾動條 */
@@ -177,33 +229,6 @@
     background: #555;
 }
 
-/* 卡片樣式 */
-.card {
-    margin-bottom: 20px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    border: none;
-}
-
-/* 頁面標題 */
-.page-title {
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-/* 按鈕包裝器 */
-.button-wrapper {
-    margin-bottom: 20px;
-}
-
-/* 無貼文提示 */
-.no-posts {
-    text-align: center;
-    color: #6c757d;
-    padding: 20px;
-}
-
 /* 卡片按鈕 */
 .card-buttons {
     margin-top: 15px;
@@ -211,59 +236,60 @@
     gap: 10px;
 }
 
-.btn-edit {
-    padding: 5px 15px;
-    background-color: #28a745;
-    color: white;
-    border-radius: 4px;
+.btn-edit, .btn-delete {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     text-decoration: none;
-    transition: background-color 0.3s;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+    border: none;
 }
 
 .btn-edit:hover {
-    background-color: #218838;
-    color: white;
+    background-color: #0056b3;
+    transform: translateY(-1px);
 }
 
 .btn-delete {
-    padding: 5px 15px;
     background-color: #dc3545;
     color: white;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
 .btn-delete:hover {
     background-color: #c82333;
+    transform: translateY(-1px);
 }
 
-/* 卡片標題 */
-.card-title {
-    color: #2c3e50;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-/* 卡片內容 */
-.card-text {
-    color: #495057;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    font-size: 1.05em;
-}
-
-/* 卡片時間 */
-.card-time {
-    color: #6c757d;
-    font-size: 0.9em;
-    margin-bottom: 15px;
+/* 修正按鈕樣式 */
+.btn-delete-comment {
+    background: none;
+    border: none;
+    color: #dc3545;
+    padding: 5px;
+    font-size: 1em;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
-.card-time i {
-    margin-right: 8px;
-    color: #6c757d;
-} 
+.btn-delete-comment:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.btn-delete-comment i {
+    font-size: 1.1em;
+}
