@@ -12,62 +12,6 @@
     <a href="{{ url_for('post.new_post') }}" class="sent">新增貼文</a>
 </div>
 
-<style>
-/* 留言卡片樣式 */
-.comment-card {
-    position: relative;
-    padding: 15px;
-    margin-bottom: 10px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.comment-author {
-    font-weight: 600;
-    color: #2c3e50;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.comment-time {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    margin-right: 30px; /* 為刪除按鈕預留空間 */
-}
-
-.comment-delete {
-    position: absolute;
-    top: 12px;
-    right: 10px;
-}
-
-.btn-delete-comment {
-    background: none;
-    border: none;
-    color: #dc3545;
-    padding: 5px;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    font-size: 0.9em;
-}
-
-.btn-delete-comment:hover {
-    opacity: 1;
-    background: rgba(220, 53, 69, 0.1);
-    border-radius: 4px;
-}
-</style>
-
 {% for post in posts %}
     <div class="card">
         <div class="card-body">
@@ -78,7 +22,7 @@
             </p>
 
             <!-- 按讚按鈕 -->
-            <form action="{{ url_for('post.like_post', post_id=post.id) }}" method="POST" class="d-inline">
+            <form action="{{ url_for('post.like_post', post_id=post.post_id) }}" method="POST" class="d-inline">
                 <button type="submit" class="btn-like">
                     <i class="fas fa-heart"></i> {{ post.likes|length }}
                 </button>
@@ -86,52 +30,63 @@
 
             <!-- 留言區 -->
             <div class="comment-section mt-4">
-                <h6 class="comment-title">
-                    <i class="far fa-comments"></i> 留言區
-                </h6>
-                <form action="{{ url_for('post.add_comment', post_id=post.id) }}" method="POST" class="comment-form mb-3">
-                    <div class="input-group">
-                        <input type="text" name="content" class="form-control comment-input" placeholder="輸入留言..." required>
-                        <button type="submit" class="btn btn-primary comment-submit">
-                            <i class="fas fa-paper-plane"></i> 留言
-                        </button>
+                <div class="comment-header">
+                    <h6 class="comment-title">
+                        <i class="far fa-comments"></i> 留言 ({{ post.comments|length }})
+                    </h6>
+                    <button class="btn btn-sm btn-toggle-comments" onclick="toggleComments(this)">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <div class="comment-content" style="display: none;">
+                    {% if session.get('user') %}
+                    <form action="{{ url_for('post.add_comment', post_id=post.post_id) }}" method="POST" class="comment-form mb-3">
+                        <div class="input-group">
+                            <input type="hidden" name="next" value="index">
+                            <input type="text" name="content" class="form-control comment-input" placeholder="輸入留言..." required>
+                            <button type="submit" class="btn btn-primary comment-submit">
+                                <i class="fas fa-paper-plane"></i> 留言
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                    
+                    <!-- 顯示留言 -->
+                    <div class="comments">
+                        {% for comment in post.comments|sort(attribute='created_at', reverse=true) %}
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <span class="comment-author">
+                                    <i class="far fa-user"></i> {{ comment.author_account }}
+                                </span>
+                                <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                            {% if session.get('role') == 'M' or comment.author_account == session.get('user') %}
+                            <div class="comment-delete">
+                                <form action="{{ url_for('post.delete_comment', post_id=post.post_id, comment_id=comment.comment_id) }}" method="POST">
+                                    <input type="hidden" name="next" value="index">
+                                    <button type="submit" class="btn-delete-comment" onclick="return confirm('確定要刪除此留言嗎？')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
-                </form>
-                
-                <!-- 顯示留言 -->
-                <div class="comments">
-                    {% for comment in post.comments %}
-                    <div class="comment-card">
-                        <div class="comment-header">
-                            <span class="comment-author">
-                                <i class="far fa-user"></i> {{ comment.author_account }}
-                            </span>
-                            <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
-                        </div>
-                        <div class="comment-content">
-                            {{ comment.content }}
-                        </div>
-                        {% if session.get('role') == 'M' or comment.author_account == session.get('user') %}
-                        <div class="comment-delete">
-                            <form action="{{ url_for('post.delete_comment', post_id=post.id, comment_id=comment.id) }}" method="POST">
-                                <input type="hidden" name="next" value="index">
-                                <button type="submit" class="btn-delete-comment" onclick="return confirm('確定要刪除此留言嗎？')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
                 </div>
             </div>
 
             <!-- 編輯和刪除按鈕 -->
             <div class="card-buttons">
-                <a href="{{ url_for('post.edit_post', post_id=post.id) }}" class="btn-edit">
+                <a href="{{ url_for('post.edit_post', post_id=post.post_id) }}" class="btn-edit">
                     <i class="fas fa-edit"></i> 編輯
                 </a>
-                <form action="{{ url_for('post.delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                <form action="{{ url_for('post.delete_post', post_id=post.post_id) }}" method="POST" class="d-inline">
                     <input type="hidden" name="next" value="index">
                     <button type="submit" class="btn-delete" onclick="return confirm('確定要刪除這篇文章嗎？')">
                         <i class="fas fa-trash-alt"></i> 刪除
@@ -143,4 +98,38 @@
 {% else %}
     <p class="no-posts">目前尚無貼文。</p>
 {% endfor %}
+
+<script>
+function toggleComments(button) {
+    const commentContent = button.closest('.comment-section').querySelector('.comment-content');
+    const isHidden = commentContent.style.display === 'none';
+    
+    commentContent.style.display = isHidden ? 'block' : 'none';
+    button.querySelector('i').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+// 頁面載入時處理
+document.addEventListener('DOMContentLoaded', function() {
+    // 如果有錨點，展開對應貼文的留言區
+    if (window.location.hash) {
+        const postId = window.location.hash.substring(1);
+        const targetPost = document.getElementById(postId);
+        if (targetPost) {
+            const commentSection = targetPost.querySelector('.comment-section');
+            const commentContent = commentSection.querySelector('.comment-content');
+            const toggleButton = commentSection.querySelector('.btn-toggle-comments');
+            
+            if (commentContent && toggleButton) {
+                commentContent.style.display = 'block';
+                toggleButton.querySelector('i').style.transform = 'rotate(180deg)';
+                
+                // 平滑滾動到目標位置
+                setTimeout(() => {
+                    targetPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+    }
+});
+</script>
 {% endblock %}
