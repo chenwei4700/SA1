@@ -269,4 +269,12 @@ html, body {
 .footer-content p {
   margin: 0.3rem 0;
 }
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  vertical-align: middle;
+}
 
