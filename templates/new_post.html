@@ -17,6 +17,16 @@
             <textarea id="content" name="content" rows="5" required></textarea>
         </div>
 
+        <div class="form-group">
+            <label for="hashtag">分類標籤</label>
+            <select id="hashtag" name="hashtag" required>
+              <option value="">-- 請選擇 --</option>
+              {% for tag in hashtags %}
+                <option value="{{ tag[0] }}">{{ tag[1] }}</option>
+              {% endfor %}
+            </select>
+        </div>
+          
         <div class="form-buttons">
             <button type="submit" class="btn-submit">發佈</button>
             <a href="{{ url_for('post.index') }}" class="btn-cancel">返回</a>

@@ -23,7 +23,7 @@
             <h2 class="card-title">{{ post.title }}</h2>
             <p class="card-text">{{ post.content }}</p>
             <p class="card-user">發文者：{{ post['user_name'] }}</p>
-
+            <p class="card-hashtag">分類：#{{ post['hashtag_name'] or '未分類' }}</p>
             <!-- 使用者頭像 -->
             <img src="{{ url_for('static', filename=post['file_path'].split('static/')[-1]) if post['file_path'] else url_for('static', filename='images/avatar.png') }}"
                 alt="使用者頭像" class="user-avatar">
