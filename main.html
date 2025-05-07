@@ -15,6 +15,7 @@
     />
   </head>
   <body>
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
     <div class="chat-wrapper">
       <nav class="nav-bar">
         <button id="menu-toggle">
@@ -24,8 +25,10 @@
           <button id="close-sidebar"><i class="bi bi-x-lg"></i></button>
           <h2>選單</h2>
           <hr class="menu-divider" />
+          <a href="/update_profile"><i class="fa-solid fa-house"></i> 個人資料</a>
+          <a href="/post"><i class="fa-solid fa-house"></i> 我的貼文</a>
         </div>
-        <a href="/">
+        <a href="#">
           <svg
             width="64"
             height="64"
@@ -43,10 +46,11 @@
         </a>
         <span>輔大資管系</span>
         <div class="nav-link">
-          <i class="bi bi-house-door"></i><a href="/">首頁</a>
+          <i class="bi bi-house-door"></i><a href="#">首頁</a>
         
           {% if session.get('user') %}
-            <i class="bi bi-chat-dots"></i><a href="/post">交流區</a>
+            <i class="bi bi-megaphone"></i><a href="/post/interact">交流區</a>
+            <i class="bi bi-chat-dots"></i><a href="/chat">聊天室</a>
             <i class="bi bi-box-arrow-right"></i><a href="/logout">登出</a>
         
             <div class="user-info">
@@ -72,3 +76,32 @@
             <i class="bi bi-box-arrow-in-right"></i><a href="/">登入</a>
           {% endif %}
         </div>
+      </nav>
+
+      <div class="intro-card" style="margin-top:150px;">
+        <h1 class="intro-title">歡迎來到資管系交流平台</h1>
+        <p class="intro-text">
+            在這個網站，您可以使用 AI 功能，快速回答任何關於資管系的問題。<br><br>
+            同時，也能發文與其他使用者交流、互動，分享你的心得與疑問，一起成長！<br><br>
+            交流區 ➡️ 看看大家都在聊什麼！<br><br>
+            聊天室 ➡️ 與ai聊天，快速獲得問題解答 🔥
+
+        </p>
+      </div>
+      <body>
+        <div class="wrapper">
+          <div class="chat-wrapper">
+            <!-- 導覽列 + 主內容 -->
+            {% block content %}{% endblock %}
+          </div>
+          <footer class="footer">
+            <div class="footer-content">
+              <p>© 2025 資管系交流平台｜Designed by FJU IM</p>
+              <p>如有問題請聯絡 support@fjuim-platform.com</p>
+            </div>
+          </footer>
+        </div>
+      </body>
+      
+    
+    </div>
