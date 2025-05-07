@@ -30,35 +30,14 @@ app.secret_key = 'your_secret_key_here'  # 用於加密 session 數據
 app.permanent_session_lifetime = timedelta(minutes=3)  # session 有效期為 3 分鐘
 
 # 設定 Google Sheets API 訪問權限
-def authenticate_gspread():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("api.json", scope)
-    client = gspread.authorize(creds)
-    return client
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("api.json", scope)
+client = gspread.authorize(creds)#授權客戶端打開google sheets
 
-# 初始化 Google Sheets 客戶端
-client = authenticate_gspread()
+# 連接到指定的 Google Sheets
 sheet_id = "1C_qYknxD84tMd3yAFMmYepNHa2raJJXEbp8ZL01HeMc"  # Google Sheets 的 ID
 faq_sheet = client.open_by_key(sheet_id).sheet1  # 第一個工作表存儲 FAQ
 chat_sheet = client.open_by_key(sheet_id).worksheet("工作表2")  # 第二個工作表存儲暫存的網頁內容
-
-def insert_faq_at_position(question, answer, index=2):
-    """
-    在指定位置插入 FAQ
-    參數：
-        question: 問題
-        answer: 回答
-        index: 插入位置（預設為第2行）
-    """
-    try:
-        # 準備要插入的資料
-        new_row = [question, answer]
-        # 在指定位置插入新的一行
-        faq_sheet.insert_row(new_row, index)
-        return True
-    except Exception as e:
-        logger.error(f"插入 FAQ 時發生錯誤: {str(e)}")
-        return False
 
 # 設定 Gemini AI
 # 使用最新的模型名称
@@ -487,43 +466,6 @@ def index():
     渲染聊天頁面
     """
     return render_template('chat.html')
-
-def search_faq(question):
-    """
-    搜索 FAQ 表中的答案
-    """
-    faq_data = faq_sheet.get_all_values()  # 從 FAQ 表中取得所有資料
-    for row in faq_data:
-        if question.lower() in row[0].lower():  # 假設第一列是問題
-            return row[1]  # 假設第二列是答案
-    return None
-
-def search_temp_content(question):
-    """
-    搜索 Temp 表中的網頁內容
-    """
-    temp_data = chat_sheet.get_all_values()  # 從 Temp 表中取得所有資料
-    for row in temp_data:
-        if question.lower() in row[2].lower():  # 假設第三列是網頁內容
-            return row[2]
-    return None
-
-def process_question(question):
-    """
-    處理用戶問題，先從 FAQ 表中查找，然後從 Temp 表中查找
-    """
-    # 先查詢 FAQ 表
-    answer = search_faq(question)
-    if answer:
-        return answer
-
-    # 如果 FAQ 表沒有答案，查詢 Temp 表
-    answer = search_temp_content(question)
-    if answer:
-        return answer
-
-    # 如果兩者都沒有，則進行網頁爬取（此處簡化處理）
-    return fetch_webpage_content(question)
 
 @app.route('/ask', methods=['POST'])
 def ask():
