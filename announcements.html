@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}所有貼文{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='announce.css') }}">
+
+        <div class="wrapper">
+            <div class="chat-wrapper" style="margin-top: 80px;">
+                <div class="announcements-container">
+                    <div class="announcements-header">
+                        <h2>📢 所有公告</h2>
+                        {% if session.get('role') == 'M' %}
+                        <button onclick="showAddAnnouncementForm()" style="background-color: #1e3a5f; color: white; padding: 10px 20px; border: none; border-radius: 5px; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-plus-circle"></i> 新增公告
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    {% if announcements %}
+                        {% for announcement in announcements %}
+                        <div class="announcement-item">
+                            <div class="announcement-header">
+                                <h3>{{ announcement.title }}</h3>
+                                <span class="announcement-date">{{ announcement.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </div>
+                            <div class="announcement-content">
+                                {{ announcement.content }}
+                            </div>
+                            {% if session.get('role') == 'M' %}
+                            <div class="admin-actions">
+                                <button onclick="showEditAnnouncementForm(`{{ announcement.id }}`, `{{ announcement.title }}`, `{{ announcement.content }}`)">
+                                    <i class="bi bi-pencil"></i> 編輯公告
+                                </button>
+                                <button class="edit" onclick="deleteAnnouncement(`{{ announcement.id }}`)">
+                                    <i class="bi bi-trash"></i> 刪除公告
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-announcements">
+                            <p>目前沒有任何公告</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <p>© 2025 資管系交流平台｜Designed by FJU IM</p>
+                    <p>如有問題請聯絡 support@fjuim-platform.com</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='announce.js') }}"></script>
+</body>
+</html>
+
+{% endblock %}

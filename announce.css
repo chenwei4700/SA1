@@ -1,0 +1,232 @@
+/* 公告頁面容器 */
+.announcements-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 頁面標題區域 */
+.announcements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #1e3a5f;
+}
+
+.announcements-header h2 {
+    color: #1e3a5f;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* 新增公告按鈕 */
+.add-announcement-btn {
+    background-color: #1e3a5f;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.add-announcement-btn i {
+    font-size: 1.3rem;
+}
+
+.add-announcement-btn:hover {
+    background-color: #2c5282;
+    transform: translateY(-1px);
+}
+
+/* 公告卡片 */
+.announcement-item {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #1e3a5f;
+    transition: transform 0.2s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.announcement-item:hover {
+    transform: translateY(-2px);
+}
+
+/* 公告標題區域 */
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.announcement-header h3 {
+    color: #1e3a5f;
+    font-size: 1.3rem;
+    margin: 0;
+    flex: 1;
+}
+
+.announcement-date {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    margin-left: 20px;
+}
+
+/* 公告內容 */
+.announcement-content {
+    color: #333;
+    line-height: 1.6;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* 管理者操作按鈕 */
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+    justify-content: flex-end;
+}
+
+.admin-actions button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
+}
+
+.admin-actions button:first-child {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+.admin-actions button.edit {
+    background-color: #dc3545;
+    color: white;
+}
+
+.admin-actions button:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.admin-actions button i {
+    font-size: 1.1rem;
+}
+
+/* 無公告提示 */
+.no-announcements {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    color: #666;
+    margin-top: 20px;
+}
+
+.no-announcements p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* 彈出視窗中的公告標題區域 */
+.modal-box .announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-box .announcement-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #1e3a5f;
+    font-weight: 700;
+    flex: 1;
+}
+
+.modal-box .announcement-date {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    margin-left: 15px;
+}
+
+.modal-box .announcement-content {
+    color: #333;
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 10px 0;
+    white-space: pre-line;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .announcements-container {
+        padding: 15px;
+    }
+
+    .announcements-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .announcement-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .announcement-date {
+        margin-left: 0;
+    }
+
+    .admin-actions {
+        flex-direction: column;
+    }
+
+    .admin-actions button {
+        width: 100%;
+    }
+}
+
+/* 公告卡片的動畫效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+  
