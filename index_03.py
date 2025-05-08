@@ -5,7 +5,7 @@ import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from post_02 import post_bp
-#from ge import app
+
 
 """
 這是一個基於 Flask 的聊天機器人應用，整合了以下功能：
@@ -469,12 +469,6 @@ def save_chat_history(question, answer):
     except Exception as e:
         logger.error(f"儲存對話記錄時發生錯誤: {str(e)}")
 
-#@app.route('/')
-#def index():
-    """
-    渲染聊天頁面
-    """
-    #return render_template('chat.html')
 
 @app.route('/ask', methods=['POST'])
 def ask():
@@ -557,9 +551,6 @@ def clear_history():
         logger.error(f"清除歷史記錄時發生錯誤: {str(e)}", exc_info=True)
         return jsonify({"error": "清除歷史記錄失敗"}), 500
 
-
-#app = Flask(__name__)
-#app.secret_key = 'your_secret_key'
 
 
 # ✅ 註冊交流區 blueprint
