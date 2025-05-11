@@ -19,13 +19,13 @@
 
         <div class="form-group">
             <label for="hashtag">分類標籤</label>
-            <select id="hashtag" name="hashtag" required>
-              <option value="">-- 請選擇 --</option>
+            <select id="hashtag" name="hashtag" class="styled-select" required>
+              <option value="">— 請選擇 —</option>
               {% for tag in hashtags %}
                 <option value="{{ tag[0] }}">{{ tag[1] }}</option>
               {% endfor %}
             </select>
-        </div>
+        </div>          
           
         <div class="form-buttons">
             <button type="submit" class="btn-submit">發佈</button>
