@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2025 年 05 月 11 日 11:44
+-- 產生時間： 2025 年 05 月 13 日 15:45
 -- 伺服器版本： 10.4.28-MariaDB
 -- PHP 版本： 8.0.28
 
@@ -80,6 +80,7 @@ CREATE TABLE `images` (
 
 INSERT INTO `images` (`file_name`, `file_path`, `uploadtime`, `user_id`) VALUES
 ('412401355@fju.com_2025-05-02_7.07.54.png', 'static/uploads/412401355@fju.com_2025-05-02_7.07.54.png', '2025-05-02 11:08:03', 4),
+('412401496@m365.fju.edu.tw_2025-05-11_7.45.00.png', 'static/uploads/412401496@m365.fju.edu.tw_2025-05-11_7.45.00.png', '2025-05-11 11:45:08', 12),
 ('412401501@fju.com_2025-05-02_6.21.15.png', 'static/uploads/412401501@fju.com_2025-05-02_6.21.15.png', '2025-05-02 10:37:49', 1),
 ('412401501@fju.com_2025-05-02_6.39.33.png', 'static/uploads/412401501@fju.com_2025-05-02_6.39.33.png', '2025-05-02 10:39:44', 1),
 ('412401501@fju.com_412401501fju.com_2025-04-26_7.34.31.png', 'static/uploads/412401501@fju.com_412401501fju.com_2025-04-26_7.34.31.png', '2025-05-04 05:12:13', 1),
@@ -145,20 +146,22 @@ CREATE TABLE `Users` (
   `account` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `user_name` varchar(30) DEFAULT NULL,
-  `role` varchar(1) DEFAULT NULL
+  `role` varchar(1) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 傾印資料表的資料 `Users`
 --
 
-INSERT INTO `Users` (`user_id`, `account`, `password`, `user_name`, `role`) VALUES
-(1, '412401501@fju.com', '12345', '阿祐子', 'U'),
-(2, 'test@example.com', '12345678', '派大星', 'M'),
-(4, '412401355@fju.com', '1234', '盧兄', 'U'),
-(5, '412401434@fju.edu.tw', '1234567', '水哥', 'U'),
-(6, '412401587@fju.edu.tw', '1234567', '不揪哥', 'U'),
-(7, '412401068@fju.edu.tw', '123456', '蓋蓋', 'U');
+INSERT INTO `Users` (`user_id`, `account`, `password`, `user_name`, `role`, `is_verified`) VALUES
+(1, '412401501@m365.fju.edu.tw', '123456', '阿祐子', 'U', 0),
+(2, 'test@example.com', '12345678', '派大星', 'M', 0),
+(4, '412401355@fju.com', '1234', '盧兄', 'U', 0),
+(5, '412401434@fju.edu.tw', '1234567', '水哥', 'U', 0),
+(6, '412401587@fju.edu.tw', '1234567', '不揪哥', 'U', 0),
+(7, '412401068@fju.edu.tw', '123456', '蓋蓋', 'U', 0),
+(12, '412401496@m365.fju.edu.tw', '123456789', '瓦力力', 'U', 1);
 
 --
 -- 已傾印資料表的索引
@@ -228,13 +231,13 @@ ALTER TABLE `likes`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- 已傾印資料表的限制式
