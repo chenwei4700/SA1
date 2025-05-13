@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <title>註冊頁面</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+  <body>
+    <h2>註冊</h2>
+    <div>
+      <form action="/register" method="POST">
+        <div>
+            <label>Email（學號@fju.edu.tw）:</label><br>
+            <input type="text" name="account" pattern="\d{9}@fju\.edu\.tw" required><br>
+        </div>
+        <div>
+            <label>密碼：</label><br>
+            <input type="password" name="password" minlength="6" maxlength="20" required><br>
+        </div>
+        <div>
+            <label>使用者姓名：</label><br>
+            <input type="text" name="name" required><br>
+        </div>
+        <div>
+            <label>暱稱：</label><br>
+            <input type="text" name="nickname" maxlength="30"><br>
+      </div>
+      <div>
+        <label>上傳頭像：</label><br>
+        <input type="file" name="photo" accept="image/*"><br>
+      </div>
+        <input type="submit" value="註冊" />
+    </form>
+    
+    </div>
+  </body>
+</html>
