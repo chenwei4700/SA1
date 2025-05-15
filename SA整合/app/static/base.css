@@ -1,1 +1,337 @@
+/* =========================
+   按鈕樣式統一
+========================= */
+.sent, .btn-edit, .btn-delete {
+    display: inline-block;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none
+  }
+  
+  .sent {
+    background-color: #1e3a5f;
+    color: white;
+  }
+  
+  .sent:hover {
+    background-color: #163250;
+  }
+  
+  .btn-edit {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .btn-edit:hover {
+    background-color: #0056b3;
+  }
+  
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-delete:hover {
+    background-color: #a71d2a;
+  }
+  
+  /* =========================
+     卡片區塊置中 + 樣式
+  ========================= */
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 20px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 600px; /* 貼文最大寬度 */
+  }
+  
+  /* =========================
+     內部文字
+  ========================= */
+  .page-title {
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    font-weight: 800;
+  }
+  
+  .card-title {
+    margin-bottom: 10px;
+    font-size: 2.8rem;
+    font-weight: 700;
+  }
+  
+  .card-text {
+    margin-bottom: 10px;
+    font-size: 1.3rem
+  }
+  
+  .card-time {
+    font-size: 0.9rem;
+    color: gray;
+    margin-bottom: 1rem;
+  }
+  
+  .card-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .inline-form {
+    display: inline;
+  }
+  
+  .no-posts {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2rem;
+    color: #777;
+  }
+  
+  /* =========================
+     新增貼文按鈕外框
+  ========================= */
+  .button-wrapper {
+    text-align: right;
+    margin: 20px auto;
+    max-width: 600px;
+  }
 
+  /* =========================
+   新增貼文表單樣式
+========================= */
+.post-form-container {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 80px auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-submit, .btn-cancel {
+  display: inline-block;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+
+.btn-submit:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.search-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-form input {
+  width: 80%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.search-form button {
+  padding: 8px 15px;
+  margin-left: 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background-color: #0056b3;
+}
+
+/* 管理者功能下拉式選單 */
+.admin-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-right: 15px;
+}
+
+.admin-dropdown i {
+  margin-right: 5px;
+  color: #333;
+}
+
+.admin-dropdown span {
+  color: #333;
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.admin-dropdown:hover span {
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.admin-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 5px;
+  padding: 10px 0;
+  top: 100%;
+  left: 0;
+}
+
+.admin-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.admin-dropdown .dropdown-menu a {
+  display: block;
+  padding: 10px 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.admin-dropdown .dropdown-menu a:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.admin-dropdown .dropdown-menu i {
+  margin-right: 10px;
+  color: #333;
+}
+
+.admin-dropdown .dropdown-menu a:hover i {
+  color: #333;
+}
+
+/* 預警貼文按鈕樣式 */
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.admin-actions button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.admin-actions button i {
+  font-size: 16px;
+}
+
+.admin-actions .btn-edit {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-actions .btn-edit:hover {
+  background-color: #218838;
+}
+
+.admin-actions .btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-actions .btn-delete:hover {
+  background-color: #c82333;
+}
+
+  

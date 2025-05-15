@@ -1,0 +1,125 @@
+/* account.css */
+
+/* 全頁設定 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #ffffff;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  /* 左上角 LOGO */
+  .header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  /* 中間主要內容區塊 */
+  .main-content {
+    height: calc(100vh - 60px); /* 減掉上面 header 的 60px */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 標題 */
+  h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: #333333;
+  }
+  
+  /* 卡片容器 */
+  .form-container {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* 表單 */
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 標籤 */
+  label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #555555;
+  }
+  
+  /* 輸入框 */
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  
+  /* 登入按鈕 */
+  input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+  
+  /* 按鈕 hover 效果 */
+  input[type="submit"]:hover {
+    background-color: #007bff;
+  }
+  
+  /* 註冊連結 */
+  .register-link {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .register-link a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .register-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .flash-messages {
+    background-color: #ffe0e0;
+    border: 1px solid #ffaaaa;
+    color: #cc0000;
+    padding: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  
