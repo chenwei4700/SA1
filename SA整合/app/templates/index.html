@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}我的貼文{% endblock %}
+
+{% block content %}
+<h1 class="page-title">我的貼文</h1>
+
+<!-- 新增貼文按鈕 -->
+<div class="button-wrapper">
+    <a href="{{ url_for('post.new_post') }}" class="sent">新增貼文</a>
+</div>
+
+{% for post in posts %}
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ post['title'] }}</h2>
+            <p class="card-text">{{ post['content'] }}</p>
+            <p class="card-time">
+                發佈時間: 
+                {{ post['created_at'] if post['created_at'].__class__.__name__ == 'str'
+                    else post['created_at'].strftime('%Y-%m-%d %H:%M:%S') }}
+            </p>
+            <div class="card-buttons">
+                <a href="{{ url_for('post.edit_post', post_id=post['post_id']) }}" class="btn-edit">編輯</a>
+                <form action="{{ url_for('post.delete_post', post_id=post['post_id']) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="next" value="index">
+                    <button type="submit" class="btn-delete" onclick="return confirm('確定要刪除這篇文章嗎？')">刪除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p class="no-posts">目前尚無貼文。</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <title>修改個人資料</title>
+  </head>
+  <body>
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
+    <div class="chat-wrapper">
+        <nav class="nav-bar">
+          <button id="menu-toggle">
+            <i class="bi bi-border-width"></i>
+          </button>
+          <div id="sidebar">
+            <button id="close-sidebar"><i class="bi bi-x-lg"></i></button>
+            <h2>選單</h2>
+            <hr class="menu-divider" />
+            <a href="/update_profile"><i class="fa-solid fa-house"></i> 個人資料</a>
+            <a href="/post"><i class="fa-solid fa-house"></i> 我的貼文</a>
+          </div>
+          <a href="#">
+            <svg
+              width="64"
+              height="64"
+              viewBox="0 0 200 200"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M40 60 L160 60 L140 100 C130 110, 110 110, 100 100 C90 90, 70 90, 60 100 Z"
+                stroke="#1e3a5f"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </a>
+          <span>輔大資管系</span>
+          <div class="nav-link">
+            <i class="bi bi-house-door"></i><a href="/dashboard">首頁</a>
+          
+            {% if session.get('user') %}
+              <i class="bi bi-chat-dots"></i><a href="/post">交流區</a>
+              <i class="bi bi-box-arrow-right"></i><a href="/logout">登出</a>
+          
+              <div class="user-info">
+                <div class="avatar-dropdown">
+                  <div class="avatar-info">
+                    <img
+                      id="userImage"
+                      src="{{ url_for('static', filename=avatar.split('static/')[1]) }}"
+                      alt="使用者頭像"
+                      class="rounded-full"
+                    />
+                    <span class="hidden md:inline">{{ name }}</span>
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  <div class="dropdown-menu">
+                    <a href="/information">編輯個人資料</a>
+                    <a href="/profile">更改頭像</a>
+                  </div>
+                </div>
+              </div>
+          
+            {% else %}
+              <i class="bi bi-box-arrow-in-right"></i><a href="/">登入</a>
+            {% endif %}
+          </div>
+        </nav>
+        <div class="profile-form-container">
+            <h2>修改個人資料</h2>
+        
+            <form method="POST" enctype="multipart/form-data" action="/update_profile">
+                <div>
+                    <label for="name">新的使用者名稱：</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ session.get('name') }}"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label for="nickname">新的暱稱：</label>
+                    <input
+                        type="text"
+                        id="nickname"
+                        name="nickname"
+                        value="{{ session.get('nickname', '') }}"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label for="photo">新的頭像：</label>
+                    <input type="file" id="photo" name="photo" accept="image/*" />
+                </div>
+        
+                
+
+                <button type="submit">儲存修改</button>
+            </form>
+        </div>
+        
+  </body>
+</html>

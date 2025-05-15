@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='chat.css') }}"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link
+        rel="icon"
+        href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCQvRUMCVLV0tQ-FTN0ozYD46foS6NsF8Ow&s"
+    />
+    <style>
+      /* Modal 樣式 (如果 base.html 或 chat.css 沒有提供) */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      /* Loading spinner 樣式 (如果 chat.css 沒有提供) */
+      /* 確保 #loading-spinner-container 或 #input-area .loading-spinner 有定義 */
+      .loading-spinner {
+          border: 4px solid #f3f3f3; /* Light grey */
+          border-top: 4px solid #3498db; /* Blue */
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          animation: spin 1s linear infinite;
+          /* margin: 0 10px; /* 調整位置 */
+      }
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+      /* 建議按鈕樣式 */
+      #suggestion-list button {
+            padding: 6px 12px;
+            border: 1px solid #93c5fd; /* 淺藍色邊框 */
+            background: #e0f2fe; /* 更淺的藍色背景 */
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #0369a1; /* 深一點的藍色文字 */
+      }
+      #suggestion-list button:hover {
+            background: #bfdbfe; /* 滑鼠懸停時稍深的背景 */
+      }
+    </style>
+    <script>
+        async function sendMessage() {
+            const questionInput = document.getElementById("question");
+            const question = questionInput.value.trim();
+            const chatBox = document.querySelector(".chat-box");
+            const loadingSpinner = document.getElementById("loading-spinner"); // 指向固定的 loading spinner 元素
+
+            if (!question) {
+                // 使用 innerHTML 添加訊息
+                chatBox.innerHTML += `<div class="message bot">請輸入問題！</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                return;
+            }
+
+            chatBox.innerHTML += `<div class="message user">${question}</div>`;
+            questionInput.value = "";
+            if(loadingSpinner) loadingSpinner.style.display = "inline-block"; // 顯示 loading (inline-block 以便和按鈕同行)
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch("/ask", { // API 端點以 chat.html 為主
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+                if(loadingSpinner) loadingSpinner.style.display = "none"; // 隱藏 loading
+
+                let botResponseText = "";
+                if (response.ok) {
+                    // 假設 Gemini 的回應可能包含 HTML，也可能包含 **
+                    // 如果 chat.html 的後端 /ask 已經處理了 HTML，這裡就不需要 .replace(/\*\*/g, "")
+                    // 但如果 Gemini 直接輸出 Markdown 的 **，就需要保留
+                    botResponseText = data.response.replace(/\*\*/g, ""); // 清除 **
+                } else {
+                    botResponseText = data.error || data.response || "發生錯誤，請稍後再試。";
+                }
+                chatBox.innerHTML += `<div class="message bot">${botResponseText}</div>`; // 使用 innerHTML
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch (err) {
+                console.error("Error fetching response:", err);
+                if(loadingSpinner) loadingSpinner.style.display = "none";
+                chatBox.innerHTML += `<div class="message bot">連線錯誤，請稍後再試。</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        function clearHistory() {
+            fetch('/clear_history', { // API 端點以 chat.html 為主
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                const chatBox = document.querySelector('.chat-box');
+                chatBox.innerHTML = '';
+                loadSuggestions(); // 清空後重新加載建議
+                // 可選: 重新顯示初始標題
+                if (!document.getElementById("animated-title")) {
+                    const initialTitle = document.createElement('div');
+                    initialTitle.id = "animated-title"; // 與 chat.html 的 ID 一致
+                    initialTitle.innerText = "歡迎來到聊天室"; // 與 chat.html 的文字一致
+                    chatBox.insertBefore(initialTitle, chatBox.firstChild);
+                    setTimeout(() => {
+                        if(initialTitle) initialTitle.remove();
+                    }, 15000);
+                }
+            })
+            .catch(error => console.error('Error clearing history:', error));
+        }
+
+        async function loadSuggestions() {
+            try {
+                // 假設建議問題的 API 路徑 (以 chat.html 風格)
+                const res = await fetch("/random_questions");
+                if (!res.ok) {
+                    console.error("Failed to load suggestions:", res.status);
+                    const list = document.getElementById("suggestion-list");
+                    if(list) list.innerHTML = '<li>無法載入建議問題</li>';
+                    return;
+                }
+                const questions = await res.json();
+                const list = document.getElementById("suggestion-list");
+                if (!list) return;
+
+                list.innerHTML = '';
+
+                questions.forEach(q => {
+                    const btn = document.createElement("button");
+                    btn.innerText = q;
+                    // 樣式已在 <style> 標籤中定義
+                    btn.onclick = () => {
+                        document.getElementById("question").value = q;
+                        sendMessage(); // 自動發送
+                    };
+                    list.appendChild(btn);
+                });
+            } catch (err) {
+                console.error("Error loading suggestions:", err);
+                const list = document.getElementById("suggestion-list");
+                if(list) list.innerHTML = '<li>載入建議問題時發生錯誤</li>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const closeSidebar = document.getElementById('close-sidebar');
+            const animatedTitle = document.getElementById('animated-title'); // 使用 chat.html 的 ID
+
+            if (menuToggle && sidebar && closeSidebar) {
+                menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
+                closeSidebar.addEventListener('click', () => sidebar.classList.remove('active'));
+            }
+
+            if (animatedTitle) {
+                setTimeout(() => animatedTitle.remove(), 15000);
+            }
+
+            loadSuggestions(); // 頁面載入時獲取建議問題
+        });
+
+        function openFeedbackModal() {
+            const modal = document.getElementById("feedback-modal");
+            if(modal) modal.style.display = "block";
+        }
+
+        function closeFeedbackModal() {
+            const modal = document.getElementById("feedback-modal");
+            if(modal) modal.style.display = "none";
+        }
+
+        async function submitFeedback() {
+            const satisfied = document.querySelector('input[name="satisfied"]:checked');
+            const feedbackText = document.getElementById("feedback-text").value;
+
+            if (!satisfied) {
+                alert("請選擇是否解決您的問題！");
+                return;
+            }
+
+            let lastUserQuestion = "N/A";
+            let lastBotAnswer = "N/A";
+            const messages = document.querySelectorAll(".chat-box .message");
+            // 嘗試從後往前找到最後一組 user 和 bot 的對話
+            for (let i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].classList.contains('bot')) {
+                    lastBotAnswer = messages[i].innerText; // 或 innerHTML 如果需要包含HTML標籤
+                    // 找到 bot 回答後，往前找最近的 user 問題
+                    if (i > 0 && messages[i-1].classList.contains('user')) {
+                        lastUserQuestion = messages[i-1].innerText;
+                    }
+                    break; // 找到最後一個 bot 回答即可
+                }
+            }
+             // 如果最後一條是使用者訊息，但沒有bot回應，則抓取最後一條使用者訊息
+            if (lastBotAnswer === "N/A" && messages.length > 0 && messages[messages.length - 1].classList.contains('user')) {
+                lastUserQuestion = messages[messages.length -1].innerText;
+            }
+
+
+            const response = await fetch("/feedback", { // API 端點以 chat.html 為主
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    question: lastUserQuestion,
+                    answer: lastBotAnswer,
+                    solved: satisfied.value,
+                    suggestion: feedbackText,
+                }),
+            });
+
+            if (response.ok) {
+                alert("感謝您的回饋！");
+                closeFeedbackModal();
+            } else {
+                alert("送出失敗，請稍後再試。");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="chat-wrapper">
+        <nav class="nav-bar">
+            <span>ChatApp</span>
+            <div class="nav-link">
+                <a href="/dashboard">首頁</a>
+                <a href="/post/interact">交流區</a>
+                <a href="/logout">登出</a>
+            </div>
+            <button id="menu-toggle">&#9776;</button>
+        </nav>
+
+        <aside id="sidebar">
+            <button id="close-sidebar">&times;</button>
+            <a href="#">選項一</a>
+            <hr class="menu-divider">
+            <a href="#">選項二</a>
+            <hr class="menu-divider">
+            <a href="#">選項三</a>
+        </aside>
+
+        <div id="suggestion-box" style="padding: 10px 15px; border-bottom: 1px solid #eee; background: #f9f9f9;">
+            <strong>你可以問我：</strong>
+            <div id="suggestion-list" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px;">
+                </div>
+        </div>
+
+        <div class="chat-box">
+            <div id="animated-title">歡迎來到聊天室</div>
+        </div>
+
+        <div id="input-area" style="display: flex; align-items: center; padding: 10px;">
+            <input type="text" id="question" placeholder="請輸入您的問題" style="flex-grow: 1; margin-right: 10px;">
+            <div id="loading-spinner" class="loading-spinner" style="display: none; margin-right: 10px;"></div>
+            <button type="button" onclick="openFeedbackModal()" class="feedback-btn" style="margin-right: 10px; padding: 8px 12px;">回饋</button>
+            <button class="sent" onclick="sendMessage()" style="margin-right: 10px; padding: 8px 12px;">
+                 <i class="bi bi-send"></i> 送出
+            </button>
+            <button class="clear-btn" onclick="clearHistory()" style="padding: 8px 12px;">
+                <i class="bi bi-x-square"></i> 清除
+            </button>
+        </div>
+    </div>
+
+    <div id="feedback-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeFeedbackModal()">&times;</span>
+        <h2>這個回答是否有解決您的問題？</h2>
+        <label>
+          <input type="radio" name="satisfied" value="yes"> 是
+        </label>
+        <label>
+          <input type="radio" name="satisfied" value="no"> 否
+        </label>
+        <h3 style="margin-top:15px; margin-bottom:5px;">請問有什麼建議可以讓我們改善？</h3>
+        <textarea id="feedback-text" rows="4" style="width: 95%;" placeholder="請輸入您的建議..."></textarea>
+        <button onclick="submitFeedback()" style="margin-top:15px;">送出回饋</button>
+      </div>
+    </div>
+
+</body>
+</html>
