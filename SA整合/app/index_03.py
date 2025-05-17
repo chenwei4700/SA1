@@ -745,10 +745,10 @@ def register():
             verify_url = url_for('index.verify_email', token=token, _external=True)
             
             # 假設 index_bp.config['MAIL_USERNAME'] 已被正確設定，或使用 current_app.config
-            sender_email = current_app.config.get('MAIL_USERNAME', 'default_sender@example.com')
+            # sender_email = current_app.config.get('MAIL_USERNAME', 'default_sender@example.com')
 
             msg = Message(subject="Email Verification",
-                          sender=sender_email, # 使用 config 中的寄件者
+                          sender = current_app.config.get('MAIL_USERNAME'),
                           recipients=[account])
             msg.body = f"""您好，
 
@@ -822,7 +822,10 @@ def update_profile():
             if file and file.filename != '' and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filename = f"{session['user']}_{filename}"
-                filepath = os.path.join(index_bp.config['UPLOAD_FOLDER'], filename)
+                upload_folder = os.path.join(current_app.root_path, 'static/uploads')
+                os.makedirs(upload_folder, exist_ok=True)  # 確保資料夾存在
+                filepath = os.path.join(upload_folder, filename)
+
                 file.save(filepath)
 
                 # ✅ 插入 images（user_id 改為 FK 整數）
@@ -866,11 +869,6 @@ def get_recent_announcements():
         print(f"Error fetching announcements: {e}")
         return []
     
-
-
-
-
-
 
 #這裡下面是公告部分
 @index_bp.route('/announcements')
@@ -992,7 +990,7 @@ def upload_avatar():
     photo = request.files['photo']
     if photo and allowed_file(photo.filename):
         filename = secure_filename(photo.filename)
-        filepath = os.path.join(index_bp.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         photo.save(filepath)
 
         # 更新 session 中的 avatar 路徑
