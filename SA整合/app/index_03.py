@@ -294,28 +294,20 @@ def is_similar(a, b, threshold=0.7):
     return SequenceMatcher(None, a, b).ratio() >= threshold
 
 def collect_similar_answers_with_intent(question):
-    """
-    基於意圖分析收集與問題相關的答案
-    參數：
-        question: 用戶的問題
-    返回：
-        整理後的答案文本
-    """
     try:
         # 先查詢暫存內容
         cached_content = search_cached_content(question)
         if cached_content:
-            return cached_content
-        
+            return cached_content, 0  # ⬅️ 回傳兩個值
+
         # 使用 Gemini 分析問題意圖
         intent_data = analyze_question_intent(question)
         print(f"問題意圖分析結果: {intent_data}")
         
         # 檢查問題是否與資管系課業相關
         if intent_data.get("is_relevant") == False:
-            return "抱歉，我只能回答與資管系課業相關的問題。您的問題似乎與資管系課業無關。"
-        
-        # 直接获取所有值并手动解析，避免表头问题
+            return "抱歉，我只能回答與資管系課業相關的問題。您的問題似乎與資管系課業無關。", 1  # ⬅️ 回傳兩個值
+
         try:
             conn = get_db_connection()
             cur = conn.cursor()
@@ -324,11 +316,9 @@ def collect_similar_answers_with_intent(question):
             column_names = [desc[0] for desc in cur.description]
             cur.close()
             conn.close()
-            if not all_values or len(all_values) < 2:  # 检查是否有数据
-                return "抱歉，找不到相關回答。(FAQ表格為空)"
-                
-            
-            # 构建数据列表
+            if not all_values or len(all_values) < 2:
+                return "抱歉，找不到相關回答。(FAQ表格為空)", 2  # ⬅️ 回傳兩個值
+
             question_col = -1
             answer_col = -1
             for i, col in enumerate(column_names):
@@ -338,9 +328,8 @@ def collect_similar_answers_with_intent(question):
                     answer_col = i
 
             if question_col == -1 or answer_col == -1:
-                return "抱歉，無法辨識資料表中的問題或回答欄位。"
+                return "抱歉，無法辨識資料表中的問題或回答欄位。", 0  # ⬅️ 回傳兩個值
 
-            # 構建資料列表
             data = []
             for row in all_values:
                 question_text = row[question_col] if row[question_col] else ""
@@ -351,24 +340,21 @@ def collect_similar_answers_with_intent(question):
                 })
         except Exception as e:
             print(f"獲取FAQ數據時發生錯誤: {str(e)}")
-            return "抱歉，系統查詢失敗。(獲取FAQ數據時出錯)"
-            
+            return "抱歉，系統查詢失敗。(獲取FAQ數據時出錯)", 0  # ⬅️ 回傳兩個值
+
         collected_responses = []
-        
-        # 構建搜索關鍵詞列表，使用空格分隔的单词作为关键词
+
         search_terms = []
         for word in question.lower().split():
-            if word and len(word) >= 2:  # 忽略太短的词
+            if word and len(word) >= 2:
                 search_terms.append(word)
-        
-        # 添加從意圖分析中提取的關鍵詞和同義詞
+
         for keyword_data in intent_data.get("keywords", []):
             word = keyword_data.get("word")
-            if word and isinstance(word, str):#
+            if word and isinstance(word, str):
                 word = word.lower()
                 if word not in search_terms:
                     search_terms.append(word)
-            
             synonyms = keyword_data.get("synonyms", [])
             if synonyms and isinstance(synonyms, list):
                 for synonym in synonyms:
@@ -376,54 +362,41 @@ def collect_similar_answers_with_intent(question):
                         synonym = synonym.lower()
                         if synonym not in search_terms:
                             search_terms.append(synonym)
-        
+
         print(f"搜索關鍵詞: {search_terms}")
-        
-        # 搜索匹配的答案
+
         for row in data:
             question_text = row.get("問題", "").lower()
-            
-            # 檢查是否有任何關鍵詞匹配
-            matched = False
-            for term in search_terms:
-                term = term.lower()
-                if term and question_text and (term in question_text or is_similar(term, question_text)):
-                    matched = True
-                    break
+            matched = any(term in question_text or is_similar(term, question_text) for term in search_terms)
 
-            
             if matched:
                 answer = row.get("回答", "")
                 if not answer:
-                    continue  # 跳过空答案
-                    
+                    continue
                 words = answer.split()
                 content_results = []
-                
-                # 處理答案中的 URL
+
                 for word in words:
                     if word and is_url(word):
                         content = fetch_webpage_content(word)
                         if content:
                             content_results.append(f"來自 {word} 的內容：\n{content}")
-                
-                # 組合答案
+
                 full_response = f"問題：{row['問題']}\n回答：{answer}"
                 if content_results:
                     full_response += "\n\n" + "\n\n".join(content_results)
-                
+
                 collected_responses.append(full_response)
-        
-        if not collected_responses:
-            return "抱歉，找不到相關回答。", {
+
+
+        return "\n\n---\n\n".join(collected_responses),  {
                 "unanswer_question": question,
-                "created_at": datetime.now()
+                "created_at": datetime.now(),
+                "number" : 2
             }
-        
-        return "\n\n---\n\n".join(collected_responses), None
     except Exception as e:
         print(f"收集答案時發生錯誤: {str(e)}")
-        return f"抱歉，系統查詢失敗。錯誤信息: {str(e)}"
+        return f"抱歉，系統查詢失敗。錯誤信息: {str(e)}", 0  # ⬅️ 也補上第二個值
 
 # 修改 Gemini 回應函數
 def get_gemini_response(context, question):
@@ -456,7 +429,7 @@ def get_gemini_response(context, question):
 1. 直接回應「{question}」的重點。
 2. 條理分明。
 3. 如果有相關的網頁資訊，請整合進回答中，所有連結請使用 HTML 格式超連結（<a href="..." target="_blank">網站名稱</a>），點擊後可在新分頁開啟。
-4. 如果問題與資管系課業無關，或「相關資料」不足以回答「{question}」，請委婉拒絕並說明。
+4. 如果問題與資管系課業無關，或「相關資料」不足以回答「{question}」，請委婉拒絕並說明，以很抱歉開頭。
 """
         
         response = model.generate_content(prompt)
@@ -519,32 +492,43 @@ def ask():
 
         # 使用基於意圖的方法收集答案
         collected_info, unanswer_data = collect_similar_answers_with_intent(question)
-        logger.debug(f"收集到的信息：{collected_info[:100]}...")  # 只記錄前100個字符
+        logger.debug(f"收集到的信息：{collected_info[:100]}...")
+        logger.debug(f"Unanswer data: {unanswer_data}") # Good to log this for debugging
 
+        # Initialize final_answer
+        final_answer = ""
 
-        if unanswer_data:
-            try:
-                conn = get_db_connection()
-                cur = conn.cursor()
-                insert_query = """
-                INSERT INTO unanswer (unanswer_question, created_at)
-                VALUES (%s, %s)
-                """
-                cur.execute(insert_query, (
-                    unanswer_data["unanswer_question"],
-                    unanswer_data["created_at"]
-                ))
-                conn.commit()
-                cur.close()
-                conn.close()
-                logger.info("已記錄無法回答的問題至 unanswer 表")
-            except Exception as db_err:
-                logger.error(f"記錄 unanswer 資料表時出錯: {db_err}", exc_info=True)
+        # Flag to indicate if Gemini should be called
+        should_call_gemini = True
 
-
-        # 交給 Gemini 整理答案
-        final_answer = get_gemini_response(collected_info, question)
-        logger.debug(f"Gemini 整理後答案：{final_answer[:100]}...")  # 只記錄前100個字符
+        
+        if should_call_gemini:
+            logger.debug(f"將收集到的信息交給 Gemini 整理：{collected_info[:100]}...")
+            final_answer = get_gemini_response(collected_info, question)
+            if final_answer.startswith("很抱歉"):
+                # If Gemini fails, we can still use the collected information
+                try:
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    cur.execute("""
+                    INSERT INTO unanswer (unanswer_q)
+                    VALUES (%s)
+                    """, (
+                        unanswer_data["unanswer_question"],
+                    ))
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                    logger.info("已記錄無法回答的問題至 unanswer 表")
+                except Exception as db_err:
+                    logger.error(f"記錄 unanswer 資料表時出錯: {db_err}", exc_info=True)
+                    logger.debug(f"Gemini 回應失敗，使用收集到的信息：{final_answer[:100]}...")
+                else:
+                    logger.debug(f"Gemini 整理後答案：{final_answer[:100]}...")
+        # If final_answer is still empty here (shouldn't happen if logic is correct, but as a fallback)
+        elif not final_answer:
+            logger.warning("Final answer was not set, and Gemini was not called. Defaulting to a generic error.")
+            final_answer = "抱歉，系統處理時遇到未預期的情況，無法提供回答。"
 
         # 更新對話歷史
         session['chat_history'] = session.get('chat_history', [])
