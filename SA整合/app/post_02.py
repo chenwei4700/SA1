@@ -17,7 +17,7 @@ def get_db_connection():
         unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
     )
 
-@post_bp.route('/post')
+@post_bp.route('/post' , strict_slashes=False)
 def post():
     if 'user' not in session:
         return redirect('/post')
