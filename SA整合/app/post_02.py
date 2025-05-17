@@ -244,10 +244,10 @@ def search():
         """)
 
 
-        
-        posts = cur.fetchall()
-        cur.close()
-        conn.close()
+    #修復posts沒有結果的問題
+    posts = cur.fetchall()
+    cur.close()
+    conn.close()
     
     return render_template('interact.html', posts=posts, keyword=keyword, avatar=avatar, name=name, id=id)
 
