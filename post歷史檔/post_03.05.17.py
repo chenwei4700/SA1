@@ -222,6 +222,7 @@ def search():
             f"%{keyword}%", 
             f"%{keyword}%"
         ))
+        posts = cur.fetchall()
     else:
         cur.execute("""
             SELECT 
@@ -242,10 +243,11 @@ def search():
             WHERE posts.is_alert = 0
             ORDER BY posts.created_at DESC
         """)
+        posts = cur.fetchall()
 
 
     #修復posts沒有結果的問題
-    posts = cur.fetchall()
+   
     cur.close()
     conn.close()
     
