@@ -30,6 +30,7 @@ from flask_mail import Mail, Message#要pip
 from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from .extention import mail, serializer
+from flask import current_app
 
 
 
@@ -50,7 +51,7 @@ def get_db_connection():
     return mysql.connector.connect(
         user='root',
         password='',
-        database='sa2-2',
+        database='SA3',
         unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
     )
 
@@ -705,11 +706,10 @@ def register():
             # 注意：此處 password 仍為原始密碼，應替換為 hashed_password
             sql_insert_user = """
                 INSERT INTO Users (account, password, user_name, nickname, role, is_verified) 
-                VALUES (%s, %s, %s, %s, 'U', 0)
-                RETURNING user_id; 
+                VALUES (%s, %s, %s, %s, 'U', 0) 
             """ # RETURNING user_id 是 PostgreSQL 的語法，MySQL/SQLite 有其他方式獲取 lastrowid
             cur.execute(sql_insert_user, (account, password, name, nickname)) # 使用 password, 不是 hashed_password
-            user_id = cur.fetchone()[0] # 獲取新註冊使用者的 user_id
+            user_id = cur.lastrowid # 獲取新註冊使用者的 user_id
 
             # --- 處理頭像上傳 ---
             if 'photo' in request.files:
@@ -721,8 +721,8 @@ def register():
                     unique_filename = f"{user_id}_{filename}"
                     
                     # 確保 UPLOAD_FOLDER 路徑是絕對的或相對於正確的基準點
-                    # current_app.config['UPLOAD_FOLDER'] 通常是較好的做法
-                    upload_folder = index_bp.config['UPLOAD_FOLDER']
+                    upload_folder = current_app.config['UPLOAD_FOLDER'] 
+                    # upload_folder = index_bp.config['UPLOAD_FOLDER']
                     os.makedirs(upload_folder, exist_ok=True) # 確保上傳目錄存在
                     filepath = os.path.join(upload_folder, unique_filename)
                     
@@ -745,7 +745,7 @@ def register():
             verify_url = url_for('index.verify_email', token=token, _external=True)
             
             # 假設 index_bp.config['MAIL_USERNAME'] 已被正確設定，或使用 current_app.config
-            sender_email = index_bp.config.get('MAIL_USERNAME', 'default_sender@example.com')
+            sender_email = current_app.config.get('MAIL_USERNAME', 'default_sender@example.com')
 
             msg = Message(subject="Email Verification",
                           sender=sender_email, # 使用 config 中的寄件者
@@ -1004,7 +1004,6 @@ def upload_avatar():
         flash('檔案格式不正確！')
         return redirect('/profile')
     
-
 
 
 
