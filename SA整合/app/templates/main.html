@@ -72,17 +72,17 @@
                 <div class="avatar-info">
                   <img
                     id="userImage"
-                    src="{{ url_for('static', filename=avatar.split('static/')[1]) }}"
+                    src="{{ url_for('static', filename=avatar.split('static/')[1]) }}" 
                     alt="使用者頭像"
                     class="rounded-full"
                   />
                   <span class="hidden md:inline">{{ name }}</span>
                   <i class="bi bi-person-fill"></i>
                 </div>
-                <div class="dropdown-menu">
+                <!-- <div class="dropdown-menu">
                   <a href="/information">編輯個人資料</a>
                   <a href="/profile">更改頭像</a>
-                </div>
+                </div> -->
               </div>
             </div>
         
