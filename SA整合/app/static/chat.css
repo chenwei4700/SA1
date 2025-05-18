@@ -1,278 +1,345 @@
 /* 全域設定 */
-        /* 整體畫面滿版佈局 */
-        html, body {
-            height: 100%;
-            margin: 0;
-            /* background-color: #f7f8f9; */
-            background-color: rgb(253, 250, 243);
-            font-family: sans-serif;
-        }
+/* 整體畫面滿版佈局 */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  /* background-color: #f7f8f9; */
+  background-color: rgb(253, 250, 243);
+  font-family: sans-serif;
+}
 
-        .chat-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 
-        /* 導覽列 */
-        .nav-bar {
-            /* position: fixed;
-            top: 0;
-            left: 0;
-            right: 0; */
-            background-color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ✅ 陰影 */
-        }
+/* 聊天框區域 */
+.chat-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px;
+  gap: 10px;
+  width: 80%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
-        .nav-link {
-            display: flex;
-            justify-content: center;
-            flex: 1;
-            gap: 30px;
-            width: 60px;
-            height: 20px;
-        }
+/* 對話訊息泡泡 */
+.message {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-line;
+}
 
-        .nav-link a {
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            align-items: center;
-            padding:15px; /* 左右 padding */
-            font-weight: bold;
-        }
+.user {
+  align-self: flex-end;
+  background-color: rgb(250, 195, 94);
+  color: #000;
+  border-top-right-radius: 0;
+}
 
-        .nav-link a:hover {
-            background-color: #007bff;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-            color: white;
-        }
+.bot {
+  align-self: flex-start;
+  background-color: #f1f1f1;
+  color: #000;
+  border-top-left-radius: 0;
+}
 
-        .nav-bar span{
-            font-size: 27px;
-            font-weight: bold;
-            color: #007bff;
-        }
+/* 輸入區 */
+#input-area {
+  display: flex;
+  padding: 12px 20px;
+  gap: 10px;
+  border-top: 1px solid #ccc;
+  /* background-color: #f4f4f4; */
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+}
 
-        h1 {
-            text-align: center;
-            margin: 10px 0;
-        }
+#question {
+  width: 30vw;
+  height: 40px;
+  font-size: 16px;
+  padding: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+}
 
-        /* 聊天框區域 */
-        .chat-box {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 20px;
-            gap: 10px;
-            width: 80%;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+#animated-title {
+  display: block;
+  text-align: center;
+  margin: 80px auto 0; /* 上方留空距離 */
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 0.15em solid black;
+  font-family: monospace;
+  font-size: 2em;
+  animation: typing 5s steps(24, end) 0s 3, blink-caret 0.75s step-end ;
+}
 
-        /* 對話訊息泡泡 */
-        .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            font-size: 16px;
-            line-height: 1.6;
-            word-wrap: break-word;
-            white-space: pre-line;
-        }
+/* 打字動畫 */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 18ch;
+  } /* 根據文字長度調整 */
+}
 
-        .user {
-            align-self: flex-end;
-            background-color: rgb(250, 195, 94);
-            color: #000;
-            border-top-right-radius: 0;
-        }
+/* 光標動畫 */
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: black;
+  }
+}
 
-        .bot {
-            align-self: flex-start;
-            background-color: #f1f1f1;
-            color: #000;
-            border-top-left-radius: 0;
-        }
+#menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
 
-        /* 輸入區 */
-        #input-area {
-            display: flex;
-            padding: 12px 20px;
-            gap: 10px;
-            border-top: 1px solid #ccc;
-            /* background-color: #f4f4f4; */
-            background-color: white;
-            justify-content: center;
-            align-items: center;
-        }
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -270px; /* 完全隱藏 */
+  width: 220px;
+  height: 100vh;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  transition: left 0.3s ease;
+  opacity: 0.7;
+}
 
-        #question {
-            width: 30vw;
-            height: 40px;
-            font-size: 16px;
-            padding: 0 10px;
-            border-radius: 5px;
-            border: 1px solid #aaa;
-        }
+.menu-divider {
+  border: none;
+  height: 1px;
+  background-color: white; /* 顏色依背景調整 */
+  opacity: 0.4; /* 稍微透明更柔和 */
+  margin: 4px 0; /* 上下間距 */
+}
 
-        /* 按鈕樣式 */
-        .sent {
-            padding: 8px 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 70px;
-        }
+#sidebar.active {
+  left: 0;
+}
 
-        .clear-btn {
-            padding: 8px 12px;
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            position: fixed; /* 根據你 HTML 裡的額外樣式 */
-            top: 20px;       /* 根據你 HTML 裡的額外樣式 */
-            right: 20px;     /* 根據你 HTML 裡的額外樣式 */
-        }
+/* 關閉按鈕 */
+#close-sidebar {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
 
-        .sent:hover {
-            background-color: #0056b3;
-        }
+/* 側邊欄連結 */
+#sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
 
-        .clear-btn:hover {
-            background-color: #cc0000;
-        }
+/*新增*/
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
 
-        #animated-title {
-            display: block;
-            text-align: center;
-            margin: 80px auto 0; /* 上方留空距離 */
-            width: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: .15em solid black;
-            font-family: monospace;
-            font-size: 2em;
-            animation: typing 5s steps(24, end) 0s 3, blink-caret .75s step-end infinite;
-        }
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-        /* 打字動畫 */
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 18ch } /* 根據文字長度調整 */
-        }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
 
-        /* 光標動畫 */
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: black }
-        }
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
-        #menu-toggle{
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-        }
+.close {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
 
-        #sidebar {
-            position: fixed;
-            top: 0;
-            left: -270px; /* 完全隱藏 */
-            width: 220px;
-            height: 100vh;
-            background-color: #007bff;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            gap: 20px;
-            transition: left 0.3s ease;
-            opacity: 0.7;
-        }
+#suggestion-box {
+  margin-top: 60px; /* 根據你的導覽列高度調整 */
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  background: #f9f9f9;
+}
 
-        .menu-divider {
-            border: none;
-            height: 1px;
-            background-color: white;        /* 顏色依背景調整 */
-            opacity: 0.4;                    /* 稍微透明更柔和 */
-            margin: 4px 0 ;                /* 上下間距 */
-        }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
 
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
-        #sidebar.active {
-            left: 0;
-        }
+.close {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+/* Loading spinner 樣式 (如果 chat.css 沒有提供) */
+/* 確保 #loading-spinner-container 或 #input-area .loading-spinner 有定義 */
+.loading-spinner {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  /* margin: 0 10px; /* 調整位置 */
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* 建議按鈕樣式 */
+#suggestion-list button {
+  padding: 6px 12px;
+  border: 1px solid #93c5fd; /* 淺藍色邊框 */
+  background: #e0f2fe; /* 更淺的藍色背景 */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  color: #0369a1; /* 深一點的藍色文字 */
+}
+#suggestion-list button:hover {
+  background: #bfdbfe; /* 滑鼠懸停時稍深的背景 */
+}
 
-        /* 關閉按鈕 */
-        #close-sidebar {
-            align-self: flex-end;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-        }
+#input-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* 讓按鈕區塊置中 */
+  padding: 12px 20px;
+  gap: 10px;
+  border-top: 1px solid #ccc;
+  background-color: white;
+  flex-wrap: wrap; /* ✅ 小螢幕也不會爆版 */
+}
 
-        /* 側邊欄連結 */
-        #sidebar a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-        }
+#question {
+  flex-grow: 1;
+  height: 40px;
+  font-size: 16px;
+  padding: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  min-width: 200px;
+  max-width: 50vw;
+}
 
-        /*新增*/
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 10px auto;
-        }
+.feedback-btn,
+.sent,
+.clear-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+.feedback-btn {
+  background-color: #17a2b8;
+  color: white;
+}
 
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 999;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-          }
-        
-          .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-          }
-        
-          .close {
-            float: right;
-            font-size: 24px;
-            cursor: pointer;
-          }
+.feedback-btn:hover {
+  background-color: #138496;
+}
+
+.sent {
+  background-color: #007bff;
+  color: white;
+}
+
+.sent:hover {
+  background-color: #0056b3;
+}
+
+.clear-btn {
+  background-color: #ff4444;
+  color: white;
+}
+
+.clear-btn:hover {
+  background-color: #cc0000;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
