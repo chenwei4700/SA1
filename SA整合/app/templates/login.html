@@ -1,26 +1,43 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
     <title>登入頁面</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-</head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='account.css') }}"
+    />
+  </head>
   <body>
-    <h2>請登入</h2>
-    <div>
-      <form action="/login" method="POST">
-        <div>
-          <label>Email:</label>
-          <input type="text" name="account" /><br />
+    <!-- 左上角 -->
+    <div class="header">輔大資管系</div>
+
+    <!-- 中間內容 -->
+    <div class="main-content">
+      <h2>請登入</h2>
+      <div class="form-container">
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+          <p>{{ message }}</p>
+          {% endfor %}
         </div>
-        <div>
-          <label>密碼:</label>
-          <input type="password" name="password" /><br />
+        {% endif %} {% endwith %}
+
+        <form action="/login" method="POST">
+          <div>
+            <label>帳號:</label>
+            <input type="text" name="account" placeholder="請輸入 Email" />
+          </div>
+          <div>
+            <label>密碼:</label>
+            <input type="password" name="password" placeholder="請輸入密碼" />
+          </div>
+          <input type="submit" value="登入" />
+        </form>
+        <div class="register-link">
+          還沒有帳號？<a href="/register">註冊</a>
         </div>
-        <input type="submit" value="登入" />
-        <a href="/register">註冊</a>
-      </form>
+      </div>
     </div>
   </body>
 </html>
