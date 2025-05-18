@@ -1,10 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='post.css') }}">
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // 開啟 modal
+  document.querySelectorAll("[data-bs-toggle='modal']").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const targetId = btn.getAttribute("data-bs-target");
+      const modal = document.querySelector(targetId);
+      if (modal) {
+        modal.classList.add("show");
+      }
+    });
+  });
+
+  // 關閉 modal（關閉按鈕、關閉 footer、背景區）
+  document.querySelectorAll(".modal").forEach(modal => {
+    // 關閉按鈕
+    modal.querySelectorAll("[data-bs-dismiss='modal'], .btn-close").forEach(closeBtn => {
+      closeBtn.addEventListener("click", () => modal.classList.remove("show"));
+    });
+
+    // 點背景區（但不要點內容）
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.remove("show");
+      }
+    });
+  });
+});
+</script>
+
 <div class="container pt-5" style="margin-top: 200px;"> <!-- 加上 margin-top 防止被導覽列遮擋 -->
     <div class="card shadow-sm p-4">
         <h2 class="mb-4 text-danger">🚨 被檢舉貼文管理</h2>
