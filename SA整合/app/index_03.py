@@ -31,6 +31,11 @@ from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from .extention import mail, serializer
 from flask import current_app
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 
 
@@ -51,7 +56,7 @@ def get_db_connection():
     return mysql.connector.connect(
         user='root',
         password='',
-        database='SA3',
+        database='SA2-2',
         unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
     )
 
@@ -79,55 +84,114 @@ def is_url(string):
 
 def fetch_webpage_content(url):
     """
-    爬取指定 URL 的網頁內容
+    爬取指定 URL 的網頁內容，優先使用 Selenium 處理 HTML，保留 requests 處理 PDF。
     參數：
         url: 要爬取的網頁地址
     返回：
-        處理後的網頁文本內容，如果失敗則返回 None
+        處理後的網頁文本內容，如果獲取或處理失敗則返回空字串 ""
     """
-    try:
-        if not is_url(url):
-            return ""
-            
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'#模擬瀏覽器，防止網站阻擋爬蟲請求。
-        }
-        response = requests.get(url, headers=headers, timeout=10)#發送一個 HTTP GET 請求到 url，讓請求帶上 User-Agent，避免被網站識別為爬蟲並封鎖，設定 最大等待時間 為 10 秒，避免伺服器回應過慢而導致程式卡住
-        response.raise_for_status()#如果 HTTP 請求返回的狀態碼不是 200，則會引發一個 HTTPError 異常
-        
-        content_type = response.headers.get('Content-Type', '').lower()#獲取 HTTP 響應頭中的 Content-Type 值，並將其轉換為小寫
-        
-        # 處理 PDF
-        if 'application/pdf' in content_type:
-            try:
-                with io.BytesIO(response.content) as f:#將 response.content 轉換為 BytesIO 對象，這樣可以方便地進行 PDF 文件的讀取和處理
-                    reader = PyPDF2.PdfReader(f)#使用 PyPDF2 庫讀取 PDF 文件
-                    text = ""
-                    for page in reader.pages:#遍歷 PDF 文件的每一頁，並將每頁的文字內容添加到 text 字串中
-                        text += page.extract_text() + "\n"#使用 PyPDF2 的 extract_text() 方法提取每頁的文字內容，並將其添加到 text 字串中，每頁之間用換行符分隔
-                    return text[:2000]  # 限制內容長度
-            except Exception as e:
-                logger.error(f"處理 PDF 文件時發生錯誤: {str(e)}")#是 logging 模組裡用來記錄「錯誤等級」（error level）的訊息。
-                return ""
-        
-        # 處理網頁
-        soup = BeautifulSoup(response.text, 'html.parser')#使用 BeautifulSoup 解析 HTML：方便提取標籤、文字、連結等內容。
-        #解析速度快（比 html5lib 快，但比 lxml 慢）。能自動修正 HTML 結構，適合解析不完整的 HTML。 html.parser 是 Python 內建的 HTML 解析器
-        
-        # 移除不需要的元素
-        for script in soup(["script", "style", "meta", "link", "head"]):
-            script.extract()#刪除 script 和 style 標籤，這些標籤通常包含 JavaScript 和 CSS 代碼，不包含實際的內容
-            
-        # 提取主要內容
-        main_content = soup.get_text(separator='\n', strip=True)#提取純文字內容，separator='\n' 表示以換行符號分隔文本，strip=True 表示去除前後的空白字符
-        
-        # 保存到暫存表中
-        save_webpage_content(url, main_content[:1000])  #   限制長度
-        
-        return main_content[:2000]  # 限制返回內容長度
-    except Exception as e:
-        logger.error(f"獲取網頁內容時發生錯誤: {str(e)}")#是 logging 模組裡用來記錄「錯誤等級」（error level）的訊息。
+    if not is_url(url):
+        logger.error(f"提供的 URL 無效: {url}")
         return ""
+    
+    try:
+        from PyPDF2 import PdfReader  # 較新版本
+    except ImportError:
+        from PyPDF2 import PdfFileReader as PdfReader # 為了兼容舊版本
+
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        # 先用 requests 試探性地獲取 headers，以便判斷 Content-Type
+        # 使用 stream=True 避免立即下載整個內容，特別是對於大文件或PDF
+        with requests.get(url, headers=headers, timeout=10, stream=True) as initial_response:
+            initial_response.raise_for_status() # 檢查 HTTP 狀態碼
+            content_type = initial_response.headers.get('Content-Type', '').lower()
+
+            # 處理 PDF
+            if 'application/pdf' in content_type:
+                logger.info(f"偵測到 PDF 文件: {url}")
+                try:
+                    # 完整讀取 PDF 內容
+                    pdf_content = initial_response.content # 在 stream 模式下，content 會讀取剩餘內容
+                    with io.BytesIO(pdf_content) as f:
+                        reader = PdfReader(f)
+                        text = ""
+                        for page in reader.pages:
+                            page_text = page.extract_text()
+                            if page_text: # 確保 page_text 不是 None
+                                text += page_text + "\n"
+                        logger.info(f"成功提取 PDF 文字內容，長度: {len(text)}")
+                        return text[:2000]  # 限制內容長度
+                except Exception as e:
+                    logger.error(f"處理 PDF 文件時發生錯誤 ({url}): {str(e)}")
+                    return ""
+            
+            # 處理 HTML 網頁 (使用 Selenium)
+            # (對於所有非 PDF 的情況，我們假設是網頁並嘗試用 Selenium)
+            else:
+                logger.info(f"偵測到 HTML 或其他網頁內容，使用 Selenium 處理: {url}")
+                driver = None  # 初始化 driver 變數
+                try:
+                    # --- WebDriver 設定 ---
+                    # 嘗試讓 Selenium Manager 自動管理
+                    # 您也可以取消註解並設定 driver_path 來手動指定
+                    # driver_path = '/path/to/your/chromedriver'
+                    # service = webdriver.chrome.service.Service(executable_path=driver_path)
+                    # driver = webdriver.Chrome(service=service)
+                    options = webdriver.ChromeOptions()
+                    options.add_argument('--headless') # 背景執行，不顯示瀏覽器視窗
+                    options.add_argument('--disable-gpu') # 某些系統上 headless 模式需要
+                    options.add_argument(f'user-agent={headers["User-Agent"]}') # 設定 User-Agent
+                    options.add_argument('--log-level=3') # 減少控制台輸出
+                    
+                    driver = webdriver.Chrome(options=options)
+                    driver.get(url)
+
+                    # 等待頁面加載完成 (範例：等待 body 元素出現)
+                    # 對於動態載入的網站，您可能需要更精確的等待條件
+                    # 例如等待某個特定的 class 或 id 的元素出現
+                    WebDriverWait(driver, 20).until(
+                        EC.presence_of_element_located((By.TAG_NAME, 'body'))
+                    )
+                    
+                    page_source = driver.page_source
+                    soup = BeautifulSoup(page_source, 'html.parser')
+                    
+                    # 移除不需要的元素
+                    for script_tag in soup(["script", "style", "meta", "link", "head"]):
+                        script_tag.extract()
+                    
+                    main_content = soup.get_text(separator='\n', strip=True)
+                    logger.info(f"成功使用 Selenium 提取網頁文字內容，長度: {len(main_content)}")
+                    
+                    # 保存到暫存表中 (假設此函數存在)
+                    save_webpage_content(url, main_content[:1000])
+                    
+                    return main_content[:2000]
+
+                except TimeoutException:
+                    logger.error(f"Selenium 等待元素超時 ({url})")
+                    return ""
+                except WebDriverException as e:
+                    logger.error(f"Selenium WebDriver 錯誤 ({url}): {str(e)}")
+                    return ""
+                except Exception as e:
+                    logger.error(f"使用 Selenium 處理網頁時發生未知錯誤 ({url}): {str(e)}")
+                    return ""
+                finally:
+                    if driver:
+                        driver.quit() # 確保瀏覽器關閉
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Requests 請求失敗 ({url}): {str(e)}")
+        return ""
+    except Exception as e:
+        logger.error(f"獲取網頁內容時發生未知錯誤 ({url}): {str(e)}")
+        return ""
+
 
 def save_webpage_content(url, content):
     """
@@ -659,10 +723,45 @@ def logout():
     return redirect('/')
 
 # ✅ 主頁（dashboard）
+def get_recent_announcements():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        time_threshold = datetime.now() - timedelta(days=3)  # 過去三天
+        cursor.execute("""
+            SELECT * FROM Announcements 
+            WHERE created_at >= %s 
+              AND content IS NOT NULL 
+              AND content != '' 
+            ORDER BY created_at DESC
+        """, (time_threshold,))
+        
+        announcements = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        return announcements if announcements else []
+    except Exception as e:
+        print(f"Error fetching announcements: {e}")
+        return []
+    
+    
 @index_bp.route('/dashboard')
 def dashboard():
     if 'user' in session:
-        return render_template('main.html', name=session['name'], avatar=session['avatar'])
+        try:
+            announcements = get_recent_announcements()  # <-- 多筆
+            return render_template('main.html', 
+                                   name=session['name'], 
+                                   avatar=session['avatar'],
+                                   announcements=announcements)  # <-- 不再用 if 判斷單筆內容
+        except Exception as e:
+            flash('讀取公告時發生錯誤')
+            return render_template('main.html', 
+                                   name=session['name'], 
+                                   avatar=session['avatar'],
+                                   announcements=[])
     else:
         return redirect('/')
 
@@ -846,29 +945,7 @@ def update_profile():
 
 
     
-def get_recent_announcements():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        
-        time_threshold = datetime.now() - timedelta(days=3)  # 過去三天
-        cursor.execute("""
-            SELECT * FROM Announcements 
-            WHERE created_at >= %s 
-              AND content IS NOT NULL 
-              AND content != '' 
-            ORDER BY created_at DESC
-        """, (time_threshold,))
-        
-        announcements = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-        return announcements if announcements else []
-    except Exception as e:
-        print(f"Error fetching announcements: {e}")
-        return []
-    
+
 
 #這裡下面是公告部分
 @index_bp.route('/announcements')
@@ -1002,7 +1079,3 @@ def upload_avatar():
         flash('檔案格式不正確！')
         return redirect('/profile')
     
-
-
-
-
