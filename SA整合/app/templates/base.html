@@ -50,7 +50,7 @@
                     <div class="admin-dropdown">
                         <i class="bi bi-gear"></i>
                         <span>管理者功能</span>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu" style="z-index: 1100 ;position: absolute;">
                             <a href="/post/admin/warning_post"><i class="bi bi-exclamation-triangle"></i>預警貼文</a>
                             <a href="/post/admin/flagged_posts"><i class="bi bi-clipboard-check"></i>貼文審核</a>
                             <a href="/post/admin/category_overview"><i class="bi bi-eye"></i>貼文預覽</a>
@@ -71,10 +71,6 @@
                             />
                             <span class="hidden md:inline">{{ name }}</span>
                             <i class="bi bi-person-fill"></i>
-                          </div>
-                          <div class="dropdown-menu">
-                            <a href="/information">編輯個人資料</a>
-                            <a href="/profile">更改頭像</a>
                           </div>
                         </div>
                       </div>
@@ -106,8 +102,9 @@
 }
 
 .alert {
-  z-index: 1000;
+  z-index: -1;
   position: relative;
+  
 }
 </style>
 
