@@ -73,7 +73,7 @@
                 <div class="avatar-info">
                   <img
                     id="userImage"
-                    src="{{ url_for('static', filename=avatar.split('static/')[1]) }}" 
+                    src="{{ url_for('static', filename=avatar.replace('static/', '')) }}" 
                     alt="使用者頭像"
                     class="rounded-full"
                   />
