@@ -89,7 +89,7 @@
                             {% for comment in post.comments %}
                             <div class="comment-card">
                                 <div class="comment-header"> <span class="comment-author">
-                                        <i class="far fa-user"></i> {{ comment.author_account }}
+                                        <i class="far fa-user"></i> {{ comment.author_nickname }}
                                     </span>
                                     <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
                                 </div>
