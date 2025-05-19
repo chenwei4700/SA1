@@ -137,8 +137,12 @@ def delete_post(post_id):
 
     flash('貼文已成功刪除！')
     next_page = request.form.get('next')
-    return redirect(url_for('post.interact' if next_page == 'interact' else 'post.post'
-    ''))
+    if next_page == 'interact':
+        return redirect(url_for('post.interact'))
+    elif next_page == 'warning_post':
+        return redirect(url_for('post.warning_post'))
+    else:
+        return redirect(url_for('post.post'))  # 預設頁面，可改為你希望的頁面
 
 @post_bp.route('/interact')
 def interact():
@@ -173,7 +177,7 @@ def interact():
     # 針對每篇貼文查詢留言
     for post in posts:
         cur.execute("""
-            SELECT comments.*, Users.account AS author_account
+            SELECT comments.*, Users.account AS author_account, Users.nickname AS author_nickname
             FROM comments
             JOIN Users ON comments.user_id = Users.user_id
             WHERE comments.post_id = %s
@@ -187,8 +191,9 @@ def interact():
     avatar = session.get('avatar', 'images/avatar.png')
     name = session.get('name', '未登入')
     id = session.get('user_id')
+    nickname = session.get('nickname')
 
-    return render_template('interact.html', posts=posts, avatar=avatar, name=name, id=id)
+    return render_template('interact.html', posts=posts, avatar=avatar, name=name, id=id, nickname=nickname)
 
 @post_bp.route('/interact/search', methods=['GET', 'POST'])
 def search():
