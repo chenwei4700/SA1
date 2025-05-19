@@ -640,6 +640,7 @@ def login():
             session['user_id'] = user[0]
             session['name'] = user[3]
             session['role'] = user[4]
+            session['nickname'] = user[6] 
 
         cur.execute("""
             SELECT file_path
@@ -760,20 +761,24 @@ def register():
                     # 為了避免檔名衝突，可以加上 user_id 或 account (確保 account 字元適合檔名)
                     # unique_filename = f"{user_id}_{filename}" # 或 f"{account.split('@')[0]}_{filename}"
                     unique_filename = f"{user_id}_{filename}"
-                    
+                    current_app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
                     # 確保 UPLOAD_FOLDER 路徑是絕對的或相對於正確的基準點
-                    upload_folder = current_app.config['UPLOAD_FOLDER'] 
-                    # upload_folder = index_bp.config['UPLOAD_FOLDER']
-                    os.makedirs(upload_folder, exist_ok=True) # 確保上傳目錄存在
-                    filepath = os.path.join(upload_folder, unique_filename)
-                    
+                    # ✅ 這裡修正成 static/uploads
+                    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+                    os.makedirs(upload_folder, exist_ok=True)  # 確保資料夾存在
+
+                    filepath = os.path.join(upload_folder, filename)
                     file.save(filepath)
+
+                    # ✅ 儲存相對路徑給資料庫（要以 static 開頭）
+                    relative_path = f"uploads/{filename}"  # 沒有 static/ 沒有本機路徑
+                    
 
                     # 將頭像資訊存入 images 資料表
                     cur.execute("""
                         INSERT INTO images (file_name, file_path, user_id)
                         VALUES (%s, %s, %s)
-                    """, (unique_filename, filepath, user_id))
+                    """, (unique_filename, relative_path, user_id))
                 elif file and file.filename != '': # 如果上傳了檔案但不符合類型
                     flash('上傳的頭像檔案類型不被允許。')
                     # 決定是否因為頭像錯誤而中止註冊，或僅提示並繼續（不保存頭像）
@@ -846,37 +851,48 @@ def update_profile():
         return redirect('/')
     avatar = session.get('avatar', 'images/avatar.png')
     name = session.get('name', '未登入')
+    nickname = session.get('nickname', '')
 
     if request.method == 'POST':
         new_name = request.form['name']
+        new_nickname = request.form['nickname']
 
         conn = get_db_connection()
         cur = conn.cursor()
 
         # ✅ 更新使用者名稱（使用 account 字串）
-        cur.execute("UPDATE Users SET user_name = %s WHERE account = %s", (new_name, session['user']))
+        cur.execute("UPDATE Users SET user_name = %s ,nickname = %s WHERE account = %s", (new_name, new_nickname, session['user']))
         conn.commit()
         session['name'] = new_name
+        session['nickname'] = new_nickname
 
         if 'photo' in request.files:
             file = request.files['photo']
             if file and file.filename != '' and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filename = f"{session['user']}_{filename}"
-                upload_folder = os.path.join(current_app.root_path, 'static/uploads')
-                os.makedirs(upload_folder, exist_ok=True)  # 確保資料夾存在
-                filepath = os.path.join(upload_folder, filename)
 
+                # ✅ 這裡修正成 static/uploads
+                upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+                os.makedirs(upload_folder, exist_ok=True)  # 確保資料夾存在
+
+                filepath = os.path.join(upload_folder, filename)
                 file.save(filepath)
 
-                # ✅ 插入 images（user_id 改為 FK 整數）
+                # ✅ 儲存相對路徑給資料庫（要以 static 開頭）
+                relative_path = f"uploads/{filename}"  # 沒有 static/ 沒有本機路徑
+
+                
+
+                # ✅ 插入資料表
                 cur.execute("""
                     INSERT INTO images (file_name, file_path, uploadtime, user_id)
                     VALUES (%s, %s, NOW(), %s)
-                """, (filename, filepath, session['user_id']))
+                """, (filename, relative_path, session['user_id']))
                 conn.commit()
 
-                session['avatar'] = filepath
+
+                session['avatar'] = relative_path
 
         cur.close()
         conn.close()
