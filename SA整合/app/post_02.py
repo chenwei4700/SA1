@@ -157,6 +157,7 @@ def interact():
     SELECT 
         posts.*, 
         Users.user_name, 
+        Users.nickname,
         images.file_path, 
         hashtag.hashtag_name,
         (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.post_id) AS like_count
