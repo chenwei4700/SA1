@@ -56,7 +56,7 @@ def get_db_connection():
     return mysql.connector.connect(
         user='root',
         password='',
-        database='SA3',
+        database='sa2-2',
         unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
     )
 
